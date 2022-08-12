@@ -26,7 +26,22 @@ impl geng::State for Game {
         self.render.draw(&self.model, framebuffer);
     }
 
-    fn handle_event(&mut self, _event: geng::Event) {}
+    fn handle_event(&mut self, event: geng::Event) {
+        match event {
+            geng::Event::KeyDown { key } => match key {
+                geng::Key::Space => {
+                    self.model.mechs.insert(Mech {
+                        id: self.model.id_gen.gen(),
+                        position: vec2(0.0, 5.0).map(Coord::new),
+                        velocity: Velocity::ZERO,
+                        size: Coord::new(1.0),
+                    });
+                }
+                _ => {}
+            },
+            _ => {}
+        }
+    }
 
     fn update(&mut self, delta_time: f64) {
         let delta_time = Time::new(delta_time as _);
