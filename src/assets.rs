@@ -6,9 +6,14 @@ pub use pixel_texture::*;
 
 #[derive(geng::Assets)]
 pub struct Assets {
-    pub artillery_mech: ArtilleryMech,
-    pub healer_mech: HealerMech,
-    pub tank_mech: TankMech,
+    pub mech: MechAssets,
+}
+
+#[derive(geng::Assets)]
+pub struct MechAssets {
+    pub artillery: ArtilleryMech,
+    pub healer: HealerMech,
+    pub tank: TankMech,
 }
 
 #[derive(geng::Assets)]
