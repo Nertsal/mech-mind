@@ -79,7 +79,9 @@ pub struct Unit {
 #[derive(HasId)]
 pub struct Projectile {
     pub id: Id,
+    pub lifetime: Time,
     pub collider: Collider,
+    pub on_hit: Effect,
     pub caster: Option<Id>,
     pub target: Option<Id>,
     pub position: Position,

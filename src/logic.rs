@@ -7,6 +7,7 @@ mod behaviour;
 mod effects;
 mod movement;
 mod projectiles;
+mod deaths;
 
 pub use effects::*;
 
@@ -34,6 +35,7 @@ impl Logic<'_> {
         self.process_movement();
         self.process_projectiles();
         self.process_effects();
+        self.process_deaths();
     }
 
     fn process_units(&mut self, mut f: impl FnMut(&mut Self, &mut Unit)) {
