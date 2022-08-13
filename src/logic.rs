@@ -6,6 +6,7 @@ mod action;
 mod behaviour;
 mod effects;
 mod movement;
+mod projectiles;
 
 pub use effects::*;
 
@@ -31,6 +32,7 @@ impl Logic<'_> {
         self.process_behaviour();
         self.process_actions();
         self.process_movement();
+        self.process_projectiles();
         self.process_effects();
     }
 

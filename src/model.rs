@@ -20,6 +20,7 @@ pub struct Model {
     pub gravity: Velocity,
     pub camera: Camera2d,
     pub units: Collection<Unit>,
+    pub projectiles: Collection<Projectile>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -71,6 +72,15 @@ pub struct Unit {
     pub action_state: ActionState,
 }
 
+#[derive(HasId)]
+pub struct Projectile {
+    pub id: Id,
+    pub caster: Option<Id>,
+    pub target: Option<Id>,
+    pub position: Position,
+    pub velocity: Velocity,
+}
+
 impl Model {
     pub fn new() -> Self {
         Self {
@@ -82,6 +92,7 @@ impl Model {
                 fov: FOV,
             },
             units: default(),
+            projectiles: default(),
         }
     }
 }

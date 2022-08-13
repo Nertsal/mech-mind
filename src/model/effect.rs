@@ -24,6 +24,16 @@ impl Effect {
 
 impl ProjectileEffect {
     pub fn process(self, context: EffectContext, logic: &mut Logic) {
-        info!("Projectile has spawned, pog!");
+        let caster = context.get_expect(Who::Caster, logic);
+        let target = context.get_expect(Who::Target, logic);
+        let position = self.offset + caster.position;
+        let velocity = (target.position - caster.position).normalize_or_zero();
+        logic.model.projectiles.insert(Projectile {
+            id: logic.model.id_gen.gen(),
+            caster: context.caster,
+            target: context.target,
+            position,
+            velocity,
+        });
     }
 }
