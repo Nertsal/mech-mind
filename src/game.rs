@@ -36,6 +36,8 @@ impl geng::State for Game {
                         id: self.model.id_gen.gen(),
                         faction: Faction::Mech,
                         ai: UnitAI::Mech(MechAI::Engage),
+                        health: Health::new(Hp::new(10.0)),
+                        sanity: Some(Health::new(Hp::new(100.0))),
                         sprite: Sprite {
                             texture: self.assets.mech.tank.idle.texture(),
                             size: vec2(2.0, 2.0),
@@ -64,6 +66,8 @@ impl geng::State for Game {
                         id: self.model.id_gen.gen(),
                         faction: Faction::Alien,
                         ai: UnitAI::Alien(TargetAI::Closest),
+                        health: Health::new(Hp::new(2.0)),
+                        sanity: None,
                         sprite: Sprite {
                             texture: self.assets.mech.artillery.idle.texture(),
                             size: vec2(2.0, 2.0),

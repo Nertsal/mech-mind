@@ -5,13 +5,16 @@ mod effect;
 mod id;
 mod collider;
 mod sprite;
+mod health;
 
 pub use effect::*;
 pub use collider::*;
+pub use health::*;
 pub use id::*;
 pub use sprite::*;
 
 pub type Time = R32;
+pub type Hp = R32;
 pub type Coord = R32;
 pub type Position = Vec2<Coord>;
 pub type Velocity = Vec2<Coord>;
@@ -65,6 +68,8 @@ pub struct Unit {
     pub id: Id,
     pub faction: Faction,
     pub ai: UnitAI,
+    pub health: Health,
+    pub sanity: Option<Health>,
     pub sprite: Sprite,
     pub collider: Collider,
     pub position: Position,
