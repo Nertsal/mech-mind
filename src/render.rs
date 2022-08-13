@@ -28,7 +28,7 @@ impl Render {
                 AABB::point(mech.position)
                     .extend_uniform(mech.size)
                     .map(|x| x.as_f32()),
-                &*assets.healer.clone(),
+                &*assets.healer_mech.idle.clone(),
             )
             .draw_2d(geng, framebuffer, camera);
         }
