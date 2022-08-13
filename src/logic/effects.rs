@@ -47,6 +47,10 @@ impl EffectContext {
         self.id(who).and_then(|id| logic.model.units.get(&id))
     }
 
+    pub fn get_mut<'a>(&self, who: Who, logic: &'a mut Logic<'_>) -> Option<&'a mut Unit> {
+        self.id(who).and_then(|id| logic.model.units.get_mut(&id))
+    }
+
     pub fn id_expect(&self, who: Who) -> Id {
         self.id(who).unwrap_or_else(|| {
             panic!(
@@ -59,6 +63,16 @@ impl EffectContext {
     pub fn get_expect<'a>(&self, who: Who, logic: &'a Logic<'_>) -> &'a Unit {
         let id = self.id_expect(who);
         logic.model.units.get(&id).unwrap_or_else(|| {
+            panic!(
+                "In the context {:?}, attempted to find {:?}, which have id {:?}, but they are present in the model",
+                self, who, id
+            )
+        })
+    }
+
+    pub fn get_mut_expect<'a>(&self, who: Who, logic: &'a mut Logic<'_>) -> &'a mut Unit {
+        let id = self.id_expect(who);
+        logic.model.units.get_mut(&id).unwrap_or_else(|| {
             panic!(
                 "In the context {:?}, attempted to find {:?}, which have id {:?}, but they are present in the model",
                 self, who, id

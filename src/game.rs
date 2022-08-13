@@ -55,7 +55,10 @@ impl geng::State for Game {
                             engage_radius: Coord::new(2.0),
                             effect: Effect::Projectile(Box::new(ProjectileEffect {
                                 offset: Position::ZERO,
-                                on_hit: Effect::Noop,
+                                on_hit: Effect::Damage(Box::new(DamageEffect {
+                                    damage_type: DamageType::Physical,
+                                    value: Hp::new(1.0),
+                                })),
                             })),
                         },
                         action_state: ActionState::Ready,
