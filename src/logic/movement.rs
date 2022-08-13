@@ -2,28 +2,18 @@ use super::*;
 
 impl Logic<'_> {
     pub fn process_movement(&mut self) {
-        for (position, velocity, acceleration) in self
-            .model
-            .mechs
-            .iter_mut()
-            .map(|mech| {
-                let acceleration = (mech.target_velocity - mech.velocity)
-                    .clamp_len(..=mech.acceleration * self.delta_time);
-                (&mut mech.position, &mut mech.velocity, acceleration)
-            })
-            .chain(self.model.enemies.iter_mut().map(|enemy| {
-                let acceleration = (enemy.target_velocity - enemy.velocity)
-                    .clamp_len(..=enemy.acceleration * self.delta_time);
-                (&mut enemy.position, &mut enemy.velocity, acceleration)
-            }))
-        {
-            *velocity += acceleration + self.model.gravity * self.delta_time;
-            *position += *velocity * self.delta_time;
-            if position.y <= Coord::ZERO {
-                // 0 is considered floor level
-                position.y = Coord::ZERO;
-                velocity.y = Coord::ZERO;
-            }
+        self.process_units(Self::process_unit_movement);
+    }
+
+    fn process_unit_movement(&mut self, unit: &mut Unit) {
+        let acceleration = (unit.target_velocity - unit.velocity)
+            .clamp_len(..=unit.acceleration * self.delta_time);
+        unit.velocity += acceleration + self.model.gravity * self.delta_time;
+        unit.position += unit.velocity * self.delta_time;
+        if unit.position.y <= Coord::ZERO {
+            // 0 is considered floor level
+            unit.position.y = Coord::ZERO;
+            unit.velocity.y = Coord::ZERO;
         }
     }
 }

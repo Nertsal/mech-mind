@@ -33,4 +33,13 @@ impl Logic<'_> {
         self.process_movement();
         self.process_effects();
     }
+
+    fn process_units(&mut self, mut f: impl FnMut(&mut Self, &mut Unit)) {
+        let ids: Vec<_> = self.model.units.ids().copied().collect();
+        for id in ids {
+            let mut unit = self.model.units.remove(&id).unwrap();
+            f(self, &mut unit);
+            self.model.units.insert(unit);
+        }
+    }
 }

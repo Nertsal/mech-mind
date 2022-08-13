@@ -19,8 +19,18 @@ pub struct Model {
     pub id_gen: IdGen,
     pub gravity: Velocity,
     pub camera: Camera2d,
-    pub mechs: Collection<Mech>,
-    pub enemies: Collection<Enemy>,
+    pub units: Collection<Unit>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Faction {
+    Mech,
+    Alien,
+}
+
+pub enum UnitAI {
+    Mech(MechAI),
+    Alien(TargetAI),
 }
 
 pub enum MechAI {
@@ -46,29 +56,19 @@ pub enum ActionState {
 }
 
 #[derive(HasId)]
-pub struct Mech {
+pub struct Unit {
     pub id: Id,
+    pub faction: Faction,
+    pub ai: UnitAI,
+    pub sprite: Rc<PixelTexture>,
     pub position: Position,
     pub velocity: Velocity,
     pub size: Coord,
-    pub ai: MechAI,
     pub speed: Coord,
     pub acceleration: Coord,
     pub target_velocity: Velocity,
     pub action: Action,
     pub action_state: ActionState,
-}
-
-#[derive(HasId)]
-pub struct Enemy {
-    pub id: Id,
-    pub position: Position,
-    pub velocity: Velocity,
-    pub size: Coord,
-    pub target_ai: TargetAI,
-    pub speed: Coord,
-    pub acceleration: Coord,
-    pub target_velocity: Velocity,
 }
 
 impl Model {
@@ -81,8 +81,7 @@ impl Model {
                 rotation: 0.0,
                 fov: FOV,
             },
-            mechs: default(),
-            enemies: default(),
+            units: default(),
         }
     }
 }

@@ -2,53 +2,51 @@ use super::*;
 
 impl Logic<'_> {
     pub fn process_behaviour(&mut self) {
-        self.process_enemies();
-        self.process_mechs();
+        self.process_units(Self::process_unit_behaviour);
     }
 
-    fn process_enemies(&mut self) {
-        for enemy in &mut self.model.enemies {
-            let target = match &enemy.target_ai {
-                TargetAI::Closest => self
-                    .model
-                    .mechs
-                    .iter()
-                    .min_by_key(|mech| (mech.position - enemy.position).len_sqr()),
-            };
-            let vx = match target {
-                Some(target) => (target.position.x - enemy.position.x).clamp_abs(enemy.speed),
-                None => Coord::ZERO,
-            };
-            enemy.target_velocity = vec2(vx, enemy.velocity.y);
-        }
-    }
-
-    fn process_mechs(&mut self) {
-        for mech in &mut self.model.mechs {
-            match &mech.ai {
+    fn process_unit_behaviour(&mut self, unit: &mut Unit) {
+        match &unit.ai {
+            UnitAI::Mech(ai) => match ai {
                 MechAI::Engage => {
                     let target = self
                         .model
-                        .enemies
+                        .units
                         .iter()
-                        .min_by_key(|enemy| (mech.position - enemy.position).len_sqr());
+                        .filter(|other| other.faction != unit.faction)
+                        .min_by_key(|enemy| (unit.position - enemy.position).len_sqr());
                     if let Some(target) = target {
-                        let distance = (target.position - mech.position).len();
-                        if distance > mech.action.engage_radius {
+                        let distance = (target.position - unit.position).len();
+                        if distance > unit.action.engage_radius {
                             // Go towards the target
-                            let vx = (target.position.x - mech.position.x).clamp_abs(mech.speed);
-                            mech.target_velocity = vec2(vx, mech.velocity.y);
-                            continue;
-                        } else if let ActionState::Ready = mech.action_state {
+                            let vx = (target.position.x - unit.position.x).clamp_abs(unit.speed);
+                            unit.target_velocity = vec2(vx, unit.velocity.y);
+                            return;
+                        } else if let ActionState::Ready = unit.action_state {
                             // The target is in range -> attack
-                            mech.action_state = ActionState::InProgress {
+                            unit.action_state = ActionState::InProgress {
                                 target: Some(target.id),
                             };
                         }
                     }
                 }
+            },
+            UnitAI::Alien(ai) => {
+                let target = match ai {
+                    TargetAI::Closest => self
+                        .model
+                        .units
+                        .iter()
+                        .filter(|other| other.faction != unit.faction)
+                        .min_by_key(|other| (other.position - unit.position).len_sqr()),
+                };
+                if let Some(target) = target {
+                    let vx = (target.position.x - unit.position.x).clamp_abs(unit.speed);
+                    unit.target_velocity = vec2(vx, unit.velocity.y);
+                    return;
+                }
             }
-            mech.target_velocity = vec2(Coord::ZERO, mech.velocity.y);
         }
+        unit.target_velocity = vec2(Coord::ZERO, unit.velocity.y);
     }
 }

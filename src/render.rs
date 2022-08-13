@@ -22,24 +22,13 @@ impl Render {
         let assets = &self.assets;
         let camera = &model.camera;
 
-        // Draw mechs
-        for mech in &model.mechs {
+        // Draw units
+        for unit in &model.units {
             draw_2d::TexturedQuad::new(
-                AABB::point(mech.position)
-                    .extend_uniform(mech.size)
+                AABB::point(unit.position)
+                    .extend_uniform(unit.size)
                     .map(|x| x.as_f32()),
-                &*assets.mech.healer.idle.clone(),
-            )
-            .draw_2d(geng, framebuffer, camera);
-        }
-
-        // Draw enemies
-        for enemy in &model.enemies {
-            draw_2d::Quad::new(
-                AABB::point(enemy.position)
-                    .extend_uniform(enemy.size)
-                    .map(|x| x.as_f32()),
-                Color::RED,
+                &*unit.sprite.clone(),
             )
             .draw_2d(geng, framebuffer, camera);
         }
