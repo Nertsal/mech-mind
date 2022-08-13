@@ -1,8 +1,8 @@
 use geng::prelude::*;
 
 mod assets;
-mod logic;
 mod game;
+mod logic;
 mod model;
 mod render;
 
@@ -23,7 +23,8 @@ fn main() {
         geng::LoadingScreen::new(&geng, geng::EmptyLoadingScreen, assets, {
             let geng = geng.clone();
             move |assets| {
-                let assets = assets.unwrap();
+                let mut assets = assets.unwrap();
+                assets.process(&geng);
                 let assets = Rc::new(assets);
                 game::Game::new(&geng, &assets)
             }
