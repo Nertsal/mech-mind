@@ -35,6 +35,7 @@ impl geng::State for Game {
                         position: vec2(0.0, 5.0).map(Coord::new),
                         velocity: Velocity::ZERO,
                         size: Coord::new(1.0),
+                        ai: MechAI::Engage,
                     });
                 }
                 _ => {}

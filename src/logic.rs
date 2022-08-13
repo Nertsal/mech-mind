@@ -1,4 +1,5 @@
 mod movement;
+mod behaviour;
 
 use super::*;
 
@@ -21,6 +22,7 @@ impl Model {
 
 impl Logic<'_> {
     fn process(&mut self) {
+        self.process_behaviour();
         self.process_movement();
     }
 }

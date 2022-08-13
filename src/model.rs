@@ -20,12 +20,17 @@ pub struct Model {
     pub mechs: Collection<Mech>,
 }
 
+pub enum MechAI {
+    Engage,
+}
+
 #[derive(HasId)]
 pub struct Mech {
     pub id: Id,
     pub position: Position,
     pub velocity: Velocity,
     pub size: Coord,
+    pub ai: MechAI,
 }
 
 impl Model {
