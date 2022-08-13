@@ -55,7 +55,7 @@ impl geng::State for Game {
                             engage_radius: Coord::new(10.0),
                             effect: Effect::Projectile(Box::new(ProjectileEffect {
                                 offset: Position::ZERO,
-                                speed: Coord::new(5.0),
+                                speed: Coord::new(10.0),
                                 on_hit: Effect::Damage(Box::new(DamageEffect {
                                     damage_type: DamageType::Physical,
                                     value: Hp::new(1.0),
@@ -70,7 +70,7 @@ impl geng::State for Game {
                         id: self.model.id_gen.gen(),
                         faction: Faction::Alien,
                         ai: UnitAI::Idle,
-                        health: Health::new(Hp::new(2.0)),
+                        health: Health::new(Hp::new(10.0)),
                         sanity: None,
                         sprite: Sprite {
                             texture: self.assets.mech.artillery.idle.texture(),
