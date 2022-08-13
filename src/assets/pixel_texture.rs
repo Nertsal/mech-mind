@@ -1,7 +1,13 @@
 use geng::prelude::*;
 
 #[derive(Deref, DerefMut)]
-pub struct PixelTexture(ugli::Texture);
+pub struct PixelTexture(Rc<ugli::Texture>);
+
+impl PixelTexture {
+    pub fn texture(&self) -> Rc<ugli::Texture> {
+        self.0.clone()
+    }
+}
 
 impl ugli::Uniform for PixelTexture {
     fn apply(&self, gl: &ugli::raw::Context, info: &ugli::UniformInfo) {
@@ -24,7 +30,7 @@ impl std::borrow::Borrow<ugli::Texture> for &'_ PixelTexture {
 impl From<ugli::Texture> for PixelTexture {
     fn from(mut texture: ugli::Texture) -> Self {
         texture.set_filter(ugli::Filter::Nearest);
-        Self(texture)
+        Self(Rc::new(texture))
     }
 }
 

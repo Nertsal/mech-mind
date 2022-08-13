@@ -3,9 +3,13 @@ use geng::Camera2d;
 
 mod effect;
 mod id;
+mod collider;
+mod sprite;
 
 pub use effect::*;
+pub use collider::*;
 pub use id::*;
+pub use sprite::*;
 
 pub type Time = R32;
 pub type Coord = R32;
@@ -61,10 +65,10 @@ pub struct Unit {
     pub id: Id,
     pub faction: Faction,
     pub ai: UnitAI,
-    pub sprite: Rc<PixelTexture>,
+    pub sprite: Sprite,
+    pub collider: Collider,
     pub position: Position,
     pub velocity: Velocity,
-    pub size: Coord,
     pub speed: Coord,
     pub acceleration: Coord,
     pub target_velocity: Velocity,
@@ -75,6 +79,7 @@ pub struct Unit {
 #[derive(HasId)]
 pub struct Projectile {
     pub id: Id,
+    pub collider: Collider,
     pub caster: Option<Id>,
     pub target: Option<Id>,
     pub position: Position,

@@ -6,7 +6,7 @@ mod logic;
 mod model;
 mod render;
 
-use assets::{Assets, PixelTexture};
+use assets::Assets;
 
 fn main() {
     logger::init().unwrap();

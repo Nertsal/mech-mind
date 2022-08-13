@@ -23,13 +23,7 @@ impl Render {
 
         // Draw units
         for unit in &model.units {
-            draw_2d::TexturedQuad::new(
-                AABB::point(unit.position)
-                    .extend_uniform(unit.size)
-                    .map(|x| x.as_f32()),
-                &*unit.sprite.clone(),
-            )
-            .draw_2d(geng, framebuffer, camera);
+            unit.sprite.draw(unit.position, geng, framebuffer, camera);
         }
 
         // Draw projectiles

@@ -30,6 +30,9 @@ impl ProjectileEffect {
         let velocity = (target.position - caster.position).normalize_or_zero();
         logic.model.projectiles.insert(Projectile {
             id: logic.model.id_gen.gen(),
+            collider: Collider::Aabb {
+                size: vec2(1.0, 1.0).map(Coord::new),
+            },
             caster: context.caster,
             target: context.target,
             position,
