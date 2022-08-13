@@ -32,5 +32,16 @@ impl Render {
             )
             .draw_2d(geng, framebuffer, camera);
         }
+
+        // Draw enemies
+        for enemy in &model.enemies {
+            draw_2d::Quad::new(
+                AABB::point(enemy.position)
+                    .extend_uniform(enemy.size)
+                    .map(|x| x.as_f32()),
+                Color::RED,
+            )
+            .draw_2d(geng, framebuffer, camera);
+        }
     }
 }

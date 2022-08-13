@@ -18,10 +18,15 @@ pub struct Model {
     pub gravity: Velocity,
     pub camera: Camera2d,
     pub mechs: Collection<Mech>,
+    pub enemies: Collection<Enemy>,
 }
 
 pub enum MechAI {
     Engage,
+}
+
+pub enum TargetAI {
+    Closest,
 }
 
 #[derive(HasId)]
@@ -31,6 +36,15 @@ pub struct Mech {
     pub velocity: Velocity,
     pub size: Coord,
     pub ai: MechAI,
+}
+
+#[derive(HasId)]
+pub struct Enemy {
+    pub id: Id,
+    pub position: Position,
+    pub velocity: Velocity,
+    pub size: Coord,
+    pub target_ai: TargetAI,
 }
 
 impl Model {
@@ -44,6 +58,7 @@ impl Model {
                 fov: FOV,
             },
             mechs: default(),
+            enemies: default(),
         }
     }
 }

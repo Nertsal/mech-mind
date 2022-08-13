@@ -29,13 +29,22 @@ impl geng::State for Game {
     fn handle_event(&mut self, event: geng::Event) {
         match event {
             geng::Event::KeyDown { key } => match key {
-                geng::Key::Space => {
+                geng::Key::G => {
                     self.model.mechs.insert(Mech {
                         id: self.model.id_gen.gen(),
                         position: vec2(0.0, 5.0).map(Coord::new),
                         velocity: Velocity::ZERO,
                         size: Coord::new(1.0),
                         ai: MechAI::Engage,
+                    });
+                }
+                geng::Key::H => {
+                    self.model.enemies.insert(Enemy {
+                        id: self.model.id_gen.gen(),
+                        position: vec2(5.0, 5.0).map(Coord::new),
+                        velocity: Velocity::ZERO,
+                        size: Coord::new(1.0),
+                        target_ai: TargetAI::Closest,
                     });
                 }
                 _ => {}

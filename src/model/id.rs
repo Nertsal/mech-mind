@@ -18,3 +18,9 @@ impl IdGen {
         id
     }
 }
+
+impl Default for IdGen {
+    fn default() -> Self {
+        Self::new()
+    }
+}
