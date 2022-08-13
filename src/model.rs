@@ -37,12 +37,8 @@ pub enum Faction {
 }
 
 pub enum UnitAI {
-    Mech(MechAI),
-    Alien(TargetAI),
-}
-
-pub enum MechAI {
-    Engage,
+    Engage(TargetAI),
+    Idle,
 }
 
 pub enum TargetAI {

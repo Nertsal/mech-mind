@@ -7,8 +7,9 @@ impl Logic<'_> {
 
     fn process_unit_behaviour(&mut self, unit: &mut Unit) {
         match &unit.ai {
-            UnitAI::Mech(ai) => match ai {
-                MechAI::Engage => {
+            UnitAI::Idle => {}
+            UnitAI::Engage(ai) => match ai {
+                TargetAI::Closest => {
                     let target = self
                         .model
                         .units
@@ -31,21 +32,6 @@ impl Logic<'_> {
                     }
                 }
             },
-            UnitAI::Alien(ai) => {
-                let target = match ai {
-                    TargetAI::Closest => self
-                        .model
-                        .units
-                        .iter()
-                        .filter(|other| other.faction != unit.faction)
-                        .min_by_key(|other| (other.position - unit.position).len_sqr()),
-                };
-                if let Some(target) = target {
-                    let vx = (target.position.x - unit.position.x).clamp_abs(unit.speed);
-                    unit.target_velocity = vec2(vx, unit.velocity.y);
-                    return;
-                }
-            }
         }
         unit.target_velocity = vec2(Coord::ZERO, unit.velocity.y);
     }

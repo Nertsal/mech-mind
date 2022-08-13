@@ -35,7 +35,7 @@ impl geng::State for Game {
                     self.model.units.insert(Unit {
                         id: self.model.id_gen.gen(),
                         faction: Faction::Mech,
-                        ai: UnitAI::Mech(MechAI::Engage),
+                        ai: UnitAI::Engage(TargetAI::Closest),
                         health: Health::new(Hp::new(10.0)),
                         sanity: Some(Health::new(Hp::new(100.0))),
                         sprite: Sprite {
@@ -52,7 +52,7 @@ impl geng::State for Game {
                         target_velocity: Velocity::ZERO,
                         action: Action {
                             cooldown: Time::new(1.0),
-                            engage_radius: Coord::new(2.0),
+                            engage_radius: Coord::new(10.0),
                             effect: Effect::Projectile(Box::new(ProjectileEffect {
                                 offset: Position::ZERO,
                                 speed: Coord::new(5.0),
@@ -69,7 +69,7 @@ impl geng::State for Game {
                     self.model.units.insert(Unit {
                         id: self.model.id_gen.gen(),
                         faction: Faction::Alien,
-                        ai: UnitAI::Alien(TargetAI::Closest),
+                        ai: UnitAI::Idle,
                         health: Health::new(Hp::new(2.0)),
                         sanity: None,
                         sprite: Sprite {
