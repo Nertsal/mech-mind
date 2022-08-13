@@ -36,6 +36,8 @@ impl geng::State for Game {
                         velocity: Velocity::ZERO,
                         size: Coord::new(1.0),
                         ai: MechAI::Engage,
+                        speed: Coord::new(2.0),
+                        acceleration: Coord::new(10.0),
                     });
                 }
                 geng::Key::H => {
@@ -45,6 +47,9 @@ impl geng::State for Game {
                         velocity: Velocity::ZERO,
                         size: Coord::new(1.0),
                         target_ai: TargetAI::Closest,
+                        speed: Coord::new(2.0),
+                        acceleration: Coord::new(10.0),
+                        target_velocity: Velocity::ZERO,
                     });
                 }
                 _ => {}

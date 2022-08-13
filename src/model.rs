@@ -36,6 +36,8 @@ pub struct Mech {
     pub velocity: Velocity,
     pub size: Coord,
     pub ai: MechAI,
+    pub speed: Coord,
+    pub acceleration: Coord,
 }
 
 #[derive(HasId)]
@@ -45,6 +47,9 @@ pub struct Enemy {
     pub velocity: Velocity,
     pub size: Coord,
     pub target_ai: TargetAI,
+    pub speed: Coord,
+    pub acceleration: Coord,
+    pub target_velocity: Velocity,
 }
 
 impl Model {

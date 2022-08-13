@@ -8,11 +8,18 @@ impl Logic<'_> {
 
     fn process_enemies(&mut self) {
         for enemy in &mut self.model.enemies {
-            match &enemy.target_ai {
-                TargetAI::Closest => {
-                    // TODO
-                }
-            }
+            let target = match &enemy.target_ai {
+                TargetAI::Closest => self
+                    .model
+                    .mechs
+                    .iter()
+                    .min_by_key(|mech| (mech.position - enemy.position).len_sqr()),
+            };
+            let vx = match target {
+                Some(target) => (target.position.x - enemy.position.x).clamp_abs(enemy.speed),
+                None => Coord::ZERO,
+            };
+            enemy.target_velocity = vec2(vx, enemy.velocity.y);
         }
     }
 
