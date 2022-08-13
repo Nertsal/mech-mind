@@ -11,6 +11,7 @@ pub enum Effect {
 #[derive(Debug, Clone)]
 pub struct ProjectileEffect {
     pub offset: Position,
+    pub speed: Coord,
     pub on_hit: Effect,
 }
 
@@ -42,7 +43,7 @@ impl ProjectileEffect {
         let caster = context.get_expect(Who::Caster, logic);
         let target = context.get_expect(Who::Target, logic);
         let position = self.offset + caster.position;
-        let velocity = (target.position - caster.position).normalize_or_zero();
+        let velocity = (target.position - caster.position).normalize_or_zero() * self.speed;
         logic.model.projectiles.insert(Projectile {
             id: logic.model.id_gen.gen(),
             lifetime: Time::new(10.0),
