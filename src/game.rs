@@ -38,6 +38,16 @@ impl geng::State for Game {
                         ai: MechAI::Engage,
                         speed: Coord::new(2.0),
                         acceleration: Coord::new(10.0),
+                        target_velocity: Velocity::ZERO,
+                        action: Action {
+                            cooldown: Time::new(1.0),
+                            engage_radius: Coord::new(2.0),
+                            effect: Effect::Projectile(Box::new(ProjectileEffect {
+                                offset: Position::ZERO,
+                                on_hit: Effect::Noop,
+                            })),
+                        },
+                        action_state: ActionState::Ready,
                     });
                 }
                 geng::Key::H => {

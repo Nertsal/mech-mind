@@ -1,8 +1,10 @@
 use super::*;
 use geng::Camera2d;
 
+mod effect;
 mod id;
 
+pub use effect::*;
 pub use id::*;
 
 pub type Time = R32;
@@ -29,6 +31,20 @@ pub enum TargetAI {
     Closest,
 }
 
+pub struct Action {
+    pub cooldown: Time,
+    pub engage_radius: Coord,
+    // TODO
+    // pub animation: Animation,
+    pub effect: Effect,
+}
+
+pub enum ActionState {
+    Ready,
+    InProgress { target: Option<Id> }, // TODO: Animation
+    Cooldown { time_left: Time },
+}
+
 #[derive(HasId)]
 pub struct Mech {
     pub id: Id,
@@ -38,6 +54,9 @@ pub struct Mech {
     pub ai: MechAI,
     pub speed: Coord,
     pub acceleration: Coord,
+    pub target_velocity: Velocity,
+    pub action: Action,
+    pub action_state: ActionState,
 }
 
 #[derive(HasId)]

@@ -6,7 +6,11 @@ impl Logic<'_> {
             .model
             .mechs
             .iter_mut()
-            .map(|mech| (&mut mech.position, &mut mech.velocity, Velocity::ZERO))
+            .map(|mech| {
+                let acceleration = (mech.target_velocity - mech.velocity)
+                    .clamp_len(..=mech.acceleration * self.delta_time);
+                (&mut mech.position, &mut mech.velocity, acceleration)
+            })
             .chain(self.model.enemies.iter_mut().map(|enemy| {
                 let acceleration = (enemy.target_velocity - enemy.velocity)
                     .clamp_len(..=enemy.acceleration * self.delta_time);
