@@ -4,6 +4,7 @@ impl Logic<'_> {
     pub fn process_projectiles(&mut self) {
         // Move projectiles
         for projectile in &mut self.model.projectiles {
+            projectile.velocity += self.model.gravity * self.delta_time;
             projectile.position += projectile.velocity * self.delta_time;
         }
 
@@ -22,7 +23,7 @@ impl Logic<'_> {
                         effect: projectile.on_hit.clone(),
                         context: EffectContext {
                             caster: projectile.caster,
-                            target: projectile.target,
+                            target: Some(unit.id),
                         },
                     });
                 }
