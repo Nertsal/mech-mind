@@ -58,6 +58,16 @@ pub enum TargetAI {
     Closest,
 }
 
+#[derive(Debug, Clone)]
+pub enum ProjectileAI {
+    Idle,
+    Rocket {
+        speed: Coord,
+        acceleration: Coord,
+        preferred_height: Coord,
+    },
+}
+
 #[derive(Clone)]
 pub struct Action {
     pub cooldown: Time,
@@ -80,7 +90,7 @@ pub enum ExtraUnitRender {
         shoot_pos: Position,
         /// Default is 0 degrees directed to the right
         rotation: Coord,
-    }
+    },
 }
 
 #[derive(HasId, Clone)]
@@ -120,6 +130,7 @@ pub struct UnitTemplate {
 #[derive(HasId)]
 pub struct Projectile {
     pub id: Id,
+    pub ai: ProjectileAI,
     pub lifetime: Time,
     pub collider: Collider,
     pub on_hit: Effect,

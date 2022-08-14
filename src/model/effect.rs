@@ -11,6 +11,7 @@ pub enum Effect {
 #[derive(Debug, Clone)]
 pub struct ProjectileEffect {
     pub offset: Position,
+    pub ai: ProjectileAI,
     pub speed: Coord,
     pub on_hit: Effect,
 }
@@ -64,7 +65,11 @@ impl ProjectileEffect {
 
         // Use simple prediction for better aim
         let delta = target.position - position;
-        let time = delta.len() / self.speed;
+        let time = if self.speed.approx_eq(&Coord::ZERO) {
+            Time::ZERO
+        } else {
+            delta.len() / self.speed
+        };
         let target_pos = target.position + target.velocity * time;
 
         // Aim at target_pos, accounting for gravity
@@ -73,24 +78,26 @@ impl ProjectileEffect {
         let target_real_pos = target.position;
         let target_vel = target.velocity;
 
-        let options = options.into_iter().flat_map(|(_, time)| {
+        let options = options.and_then(|(_, time)| {
             let target_pos = target_real_pos + target_vel * time;
             aim_parabollically(target_pos - position, gravity, self.speed)
         });
-        for (velocity, _) in options {
-            logic.model.projectiles.insert(Projectile {
-                id: logic.model.id_gen.gen(),
-                lifetime: Time::new(10.0),
-                collider: Collider::Aabb {
-                    size: vec2(1.0, 1.0).map(Coord::new),
-                },
-                on_hit: self.on_hit.clone(),
-                caster: context.caster,
-                target: context.target,
-                position,
-                velocity,
-            });
-        }
+        let velocity = options
+            .map(|(v, _)| v)
+            .unwrap_or((target_pos - position).normalize_or_zero() * self.speed);
+        logic.model.projectiles.insert(Projectile {
+            id: logic.model.id_gen.gen(),
+            ai: self.ai,
+            lifetime: Time::new(10.0),
+            collider: Collider::Aabb {
+                size: vec2(1.0, 1.0).map(Coord::new),
+            },
+            on_hit: self.on_hit,
+            caster: context.caster,
+            target: context.target,
+            position,
+            velocity,
+        });
         Some(())
     }
 }

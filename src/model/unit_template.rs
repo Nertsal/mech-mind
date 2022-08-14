@@ -77,6 +77,7 @@ fn tank(assets: &Rc<Assets>) -> UnitTemplate {
             2,
             Effect::Projectile(Box::new(ProjectileEffect {
                 offset: Position::ZERO,
+                ai: ProjectileAI::Idle,
                 speed: Coord::new(10.0),
                 on_hit: Effect::Damage(Box::new(DamageEffect {
                     damage_type: DamageType::Physical,
@@ -114,7 +115,22 @@ fn artillery(assets: &Rc<Assets>) -> UnitTemplate {
         &assets.mech.artillery.attack,
         vec2(2.0, 2.0),
         Time::ONE,
-        None, // TODO: set action
+        Some((
+            2,
+            Effect::Projectile(Box::new(ProjectileEffect {
+                offset: vec2(-0.5, 0.5).map(Coord::new),
+                ai: ProjectileAI::Rocket {
+                    speed: Coord::new(15.0),
+                    acceleration: Coord::new(20.0),
+                    preferred_height: Coord::new(7.0),
+                },
+                speed: Coord::ZERO,
+                on_hit: Effect::Damage(Box::new(DamageEffect {
+                    damage_type: DamageType::Explosive,
+                    value: Hp::new(3.0),
+                })),
+            })),
+        )),
     );
     let idle_animation = to_animation(
         &[assets.mech.artillery.idle.clone()],
@@ -123,7 +139,7 @@ fn artillery(assets: &Rc<Assets>) -> UnitTemplate {
         None,
     );
     UnitTemplate {
-        ai: UnitAI::Idle,
+        ai: UnitAI::Engage(TargetAI::Closest),
         health: Health::new(Hp::new(10.0)),
         sanity: None,
         collider: Collider::Aabb {
@@ -132,8 +148,8 @@ fn artillery(assets: &Rc<Assets>) -> UnitTemplate {
         speed: Coord::new(2.0),
         acceleration: Coord::new(10.0),
         action: Action {
-            cooldown: Time::new(1.0),
-            engage_radius: Coord::new(2.0),
+            cooldown: Time::new(5.0),
+            engage_radius: Coord::new(20.0),
             animation,
         },
         idle_animation,
