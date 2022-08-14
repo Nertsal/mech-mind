@@ -3,11 +3,12 @@ use model::*;
 use std::collections::VecDeque;
 
 mod action;
+mod animation;
 mod behaviour;
+mod deaths;
 mod effects;
 mod movement;
 mod projectiles;
-mod deaths;
 
 pub use effects::*;
 
@@ -31,6 +32,7 @@ impl Model {
 impl Logic<'_> {
     fn process(&mut self) {
         self.process_behaviour();
+        self.process_animations();
         self.process_actions();
         self.process_movement();
         self.process_projectiles();
