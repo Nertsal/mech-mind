@@ -193,7 +193,7 @@ fn healer(assets: &Rc<Assets>) -> UnitTemplate {
         acceleration: Coord::new(10.0),
         action: Action {
             cooldown: Time::new(1.0),
-            engage_radius: Coord::new(2.0),
+            engage_radius: Coord::new(5.0),
             animation: idle_animation.clone(),
         },
         idle_animation,
@@ -206,7 +206,24 @@ fn blighter(assets: &Rc<Assets>) -> UnitTemplate {
         &assets.enemies.blighter.attack,
         vec2(2.0, 2.0),
         Time::ONE,
-        None, // TODO: set action
+        Some((
+            10,
+            Effect::Projectile(Box::new(ProjectileEffect {
+                offset: vec2(0.0, 0.5).map(Coord::new),
+                ai: ProjectileAI::Idle,
+                speed: Coord::new(10.0),
+                on_hit: Effect::Damage(Box::new(DamageEffect {
+                    damage_type: DamageType::Physical,
+                    value: Hp::new(2.0),
+                })),
+                animation: to_animation(
+                    &[assets.enemies.blighter.projectile.clone()],
+                    vec2(0.5, 0.5),
+                    Time::ONE,
+                    None,
+                ),
+            })),
+        )),
     );
     let idle_animation = to_animation(
         &[assets.enemies.blighter.idle.clone()],
@@ -215,7 +232,7 @@ fn blighter(assets: &Rc<Assets>) -> UnitTemplate {
         None,
     );
     UnitTemplate {
-        ai: UnitAI::Idle,
+        ai: UnitAI::Engage(TargetAI::Closest),
         health: Health::new(Hp::new(10.0)),
         sanity: None,
         collider: Collider::Aabb {
@@ -225,7 +242,7 @@ fn blighter(assets: &Rc<Assets>) -> UnitTemplate {
         acceleration: Coord::new(10.0),
         action: Action {
             cooldown: Time::new(1.0),
-            engage_radius: Coord::new(2.0),
+            engage_radius: Coord::new(7.0),
             animation,
         },
         idle_animation,
