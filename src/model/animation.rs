@@ -1,9 +1,11 @@
 use super::*;
 
+#[derive(Debug, Clone)]
 pub struct Animation {
     pub keyframes: Vec<AnimationFrame>,
 }
 
+#[derive(Debug, Clone)]
 pub struct AnimationFrame {
     pub sprite: Sprite,
     pub time: Time,

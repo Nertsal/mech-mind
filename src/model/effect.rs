@@ -14,6 +14,7 @@ pub struct ProjectileEffect {
     pub ai: ProjectileAI,
     pub speed: Coord,
     pub on_hit: Effect,
+    pub animation: Rc<Animation>,
 }
 
 #[derive(Debug, Clone)]
@@ -87,6 +88,7 @@ impl ProjectileEffect {
             .unwrap_or((target_pos - position).normalize_or_zero() * self.speed);
         logic.model.projectiles.insert(Projectile {
             id: logic.model.id_gen.gen(),
+            animation_state: AnimationState::new(&self.animation).0,
             ai: self.ai,
             lifetime: Time::new(10.0),
             collider: Collider::Aabb {

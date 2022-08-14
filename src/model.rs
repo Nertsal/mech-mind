@@ -138,6 +138,7 @@ pub struct Projectile {
     pub target: Option<Id>,
     pub position: Position,
     pub velocity: Velocity,
+    pub animation_state: AnimationState,
 }
 
 impl Model {

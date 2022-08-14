@@ -3,6 +3,16 @@ use super::*;
 impl Logic<'_> {
     pub fn process_animations(&mut self) {
         self.process_units(Self::process_unit_animation);
+        for projectile in &mut self.model.projectiles {
+            let (_, effects) = projectile.animation_state.update(self.delta_time);
+            for effect in effects {
+                let context = EffectContext {
+                    caster: projectile.caster,
+                    target: projectile.target,
+                };
+                self.effects.push_front(QueuedEffect { effect, context });
+            }
+        }
     }
 
     fn process_unit_animation(&mut self, unit: &mut Unit) {

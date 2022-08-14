@@ -81,8 +81,16 @@ impl Render {
 
         // Draw projectiles
         for projectile in &model.projectiles {
-            draw_2d::Ellipse::circle(projectile.position.map(|x| x.as_f32()), 0.1, Color::RED)
-                .draw_2d(geng, framebuffer, camera);
+            let rotation = projectile.velocity.arg();
+            draw_sprite(
+                projectile.animation_state.get_sprite(),
+                projectile.position,
+                false,
+                rotation.as_f32(),
+                geng,
+                framebuffer,
+                camera,
+            );
         }
     }
 }

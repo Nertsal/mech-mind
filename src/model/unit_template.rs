@@ -83,6 +83,12 @@ fn tank(assets: &Rc<Assets>) -> UnitTemplate {
                     damage_type: DamageType::Physical,
                     value: Hp::new(1.0),
                 })),
+                animation: to_animation(
+                    &[assets.mech.tank.projectile.clone()],
+                    vec2(0.5, 0.2),
+                    Time::ONE,
+                    None,
+                ),
             })),
         )),
     );
@@ -129,6 +135,12 @@ fn artillery(assets: &Rc<Assets>) -> UnitTemplate {
                     damage_type: DamageType::Explosive,
                     value: Hp::new(3.0),
                 })),
+                animation: to_animation(
+                    &assets.mech.artillery.projectile_anim,
+                    vec2(1.0, 0.5),
+                    Time::ONE,
+                    None,
+                ),
             })),
         )),
     );
