@@ -14,7 +14,6 @@ mod particles;
 pub use effects::*;
 
 pub struct Logic<'a> {
-    pub assets: Rc<Assets>,
     pub delta_time: Time,
     pub model: &'a mut Model,
     pub effects: VecDeque<QueuedEffect>,
@@ -23,7 +22,6 @@ pub struct Logic<'a> {
 impl Model {
     pub fn update(&mut self, delta_time: Time) {
         let mut logic = Logic {
-            assets: self.assets.clone(),
             delta_time,
             model: self,
             effects: default(),
