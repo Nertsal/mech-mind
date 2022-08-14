@@ -1,5 +1,6 @@
 use super::*;
 
+#[derive(Debug, Clone)]
 pub enum Collider {
     /// An Axis-Aligned Bounding Box centered around the origin
     Aabb { size: Vec2<Coord> },

@@ -27,6 +27,11 @@ impl Model {
         };
         logic.process();
     }
+
+    pub fn spawn_unit(&mut self, template: UnitTemplate, position: Position, faction: Faction) {
+        self.units
+            .insert(template.instance(&mut self.id_gen, position, faction));
+    }
 }
 
 impl Logic<'_> {

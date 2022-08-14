@@ -1,5 +1,6 @@
 use super::*;
 
+#[derive(Debug, Clone)]
 pub struct Health {
     pub hp: Hp,
     pub max_hp: Hp,

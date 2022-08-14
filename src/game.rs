@@ -17,7 +17,7 @@ impl Game {
             geng: geng.clone(),
             assets: assets.clone(),
             render: Render::new(geng, assets),
-            model: Model::new(),
+            model: Model::new(assets),
         }
     }
 }
@@ -33,88 +33,18 @@ impl geng::State for Game {
         match event {
             geng::Event::KeyDown { key } => match key {
                 geng::Key::G => {
-                    let idle_animation = to_animation(
-                        &[self.assets.mech.tank.idle.clone()],
-                        vec2(2.0, 2.0),
-                        Time::ONE,
-                        None,
+                    self.model.spawn_unit(
+                        self.model.templates.tank.clone(),
+                        vec2(0.0, 5.0).map(Coord::new),
+                        Faction::Mech,
                     );
-                    let animation = to_animation(
-                        &self.assets.mech.tank.attack,
-                        vec2(2.0, 2.0),
-                        Time::ONE,
-                        Some((
-                            2,
-                            Effect::Projectile(Box::new(ProjectileEffect {
-                                offset: Position::ZERO,
-                                speed: Coord::new(10.0),
-                                on_hit: Effect::Damage(Box::new(DamageEffect {
-                                    damage_type: DamageType::Physical,
-                                    value: Hp::new(1.0),
-                                })),
-                            })),
-                        )),
-                    );
-                    self.model.units.insert(Unit {
-                        id: self.model.id_gen.gen(),
-                        faction: Faction::Mech,
-                        ai: UnitAI::Engage(TargetAI::Closest),
-                        health: Health::new(Hp::new(10.0)),
-                        sanity: Some(Health::new(Hp::new(100.0))),
-                        collider: Collider::Aabb {
-                            size: vec2(1.0, 2.0).map(Coord::new),
-                        },
-                        position: vec2(0.0, 5.0).map(Coord::new),
-                        velocity: Velocity::ZERO,
-                        speed: Coord::new(2.0),
-                        acceleration: Coord::new(10.0),
-                        target_velocity: Velocity::ZERO,
-                        animation_state: AnimationState::new(&idle_animation).0,
-                        action: Action {
-                            cooldown: Time::new(1.0),
-                            engage_radius: Coord::new(10.0),
-                            animation,
-                        },
-                        action_state: ActionState::Ready,
-                        idle_animation,
-                    });
                 }
                 geng::Key::H => {
-                    let animation = to_animation(
-                        &self.assets.mech.artillery.attack,
-                        vec2(2.0, 2.0),
-                        Time::ONE,
-                        None,
+                    self.model.spawn_unit(
+                        self.model.templates.blighter.clone(),
+                        vec2(10.0, 5.0).map(Coord::new),
+                        Faction::Alien,
                     );
-                    let idle_animation = to_animation(
-                        &[self.assets.mech.artillery.idle.clone()],
-                        vec2(2.0, 2.0),
-                        Time::ONE,
-                        None,
-                    );
-                    self.model.units.insert(Unit {
-                        id: self.model.id_gen.gen(),
-                        faction: Faction::Alien,
-                        ai: UnitAI::Idle,
-                        health: Health::new(Hp::new(10.0)),
-                        sanity: None,
-                        collider: Collider::Aabb {
-                            size: vec2(1.0, 2.0).map(Coord::new),
-                        },
-                        position: vec2(5.0, 5.0).map(Coord::new),
-                        velocity: Velocity::ZERO,
-                        speed: Coord::new(2.0),
-                        acceleration: Coord::new(10.0),
-                        target_velocity: Velocity::ZERO,
-                        animation_state: AnimationState::new(&idle_animation).0,
-                        action: Action {
-                            cooldown: Time::new(1.0),
-                            engage_radius: Coord::new(2.0),
-                            animation,
-                        },
-                        action_state: ActionState::Ready,
-                        idle_animation,
-                    });
                 }
                 _ => {}
             },
@@ -126,31 +56,4 @@ impl geng::State for Game {
         let delta_time = Time::new(delta_time as _);
         self.model.update(delta_time);
     }
-}
-
-fn to_animation(
-    textures: &[assets::PixelTexture],
-    sprite_size: Vec2<f32>,
-    cycle_time: Time,
-    action: Option<(usize, Effect)>,
-) -> Rc<Animation> {
-    let time = cycle_time / Time::new(textures.len() as f32);
-    Rc::new(Animation {
-        keyframes: {
-            textures
-                .iter()
-                .enumerate()
-                .map(|(frame, texture)| AnimationFrame {
-                    sprite: Sprite {
-                        texture: texture.texture(),
-                        size: sprite_size,
-                    },
-                    time,
-                    start_effect: action.as_ref().and_then(|(action_frame, action)| {
-                        (frame == *action_frame).then(|| action.clone())
-                    }),
-                })
-                .collect()
-        },
-    })
 }
