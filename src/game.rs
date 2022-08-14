@@ -32,14 +32,28 @@ impl geng::State for Game {
         #[allow(clippy::single_match)]
         match event {
             geng::Event::KeyDown { key } => match key {
-                geng::Key::G => {
+                geng::Key::Num1 => {
+                    self.model.spawn_unit(
+                        self.model.templates.healer.clone(),
+                        vec2(-10.0, 5.0).map(Coord::new),
+                        Faction::Mech,
+                    );
+                }
+                geng::Key::Num2 => {
+                    self.model.spawn_unit(
+                        self.model.templates.artillery.clone(),
+                        vec2(-5.0, 5.0).map(Coord::new),
+                        Faction::Mech,
+                    );
+                }
+                geng::Key::Num3 => {
                     self.model.spawn_unit(
                         self.model.templates.tank.clone(),
                         vec2(0.0, 5.0).map(Coord::new),
                         Faction::Mech,
                     );
                 }
-                geng::Key::H => {
+                geng::Key::Num6 => {
                     self.model.spawn_unit(
                         self.model.templates.blighter.clone(),
                         vec2(10.0, 5.0).map(Coord::new),
