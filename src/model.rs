@@ -75,6 +75,7 @@ pub struct Unit {
     pub action: Action,
     pub action_state: ActionState,
     pub animation_state: AnimationState,
+    pub idle_animation: Rc<Animation>,
 }
 
 #[derive(HasId)]

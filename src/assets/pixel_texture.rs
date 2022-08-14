@@ -1,6 +1,6 @@
 use geng::prelude::*;
 
-#[derive(Deref, DerefMut)]
+#[derive(Clone, Deref, DerefMut)]
 pub struct PixelTexture(Rc<ugli::Texture>);
 
 impl PixelTexture {

@@ -37,31 +37,45 @@ impl AnimationState {
         &self.animation.keyframes.get(self.frame).unwrap().sprite
     }
 
-    pub fn update(&mut self, delta_time: Time) -> Option<Effect> {
+    /// Update the animation state and returns whether it has started to loop
+    /// and effects that should be processed.
+    pub fn update(&mut self, delta_time: Time) -> (bool, Vec<Effect>) {
         self.frame_time += delta_time;
-        let frame = self
-            .animation
-            .keyframes
-            .get(self.frame)
-            .expect("Failed to find animation frame");
-        let delta = self.frame_time - frame.time;
-        (delta >= Time::ZERO)
-            .then(|| {
+
+        let mut looped = false;
+        let mut effects = Vec::new();
+
+        loop {
+            let frame = self
+                .animation
+                .keyframes
+                .get(self.frame)
+                .expect("Failed to find animation frame");
+            let delta = self.frame_time - frame.time;
+            if delta >= Time::ZERO {
                 // Next frame
                 self.frame_time = delta;
                 if self.animation.keyframes.len() <= self.frame + 1 {
                     // Repeat
+                    looped = true;
                     self.frame = 0;
                 } else {
                     self.frame += 1;
                 }
-                self.animation
+                if let Some(effect) = self
+                    .animation
                     .keyframes
                     .get(self.frame)
                     .unwrap()
                     .start_effect
                     .clone()
-            })
-            .flatten()
+                {
+                    effects.push(effect);
+                }
+            } else {
+                break;
+            }
+        }
+        (looped, effects)
     }
 }

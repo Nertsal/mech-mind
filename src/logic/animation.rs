@@ -6,21 +6,28 @@ impl Logic<'_> {
     }
 
     fn process_unit_animation(&mut self, unit: &mut Unit) {
-        if let Some(effect) = unit.animation_state.update(self.delta_time) {
-            let mut context = EffectContext {
+        let (looped, effects) = unit.animation_state.update(self.delta_time);
+        let target = if let ActionState::InProgress { target } = unit.action_state {
+            target
+        } else {
+            None
+        };
+        for effect in effects {
+            let context = EffectContext {
                 caster: Some(unit.id),
-                target: None,
+                target,
             };
-            if let ActionState::InProgress { target } = unit.action_state {
-                context.target = target;
-                if unit.animation_state.frame == 0 {
-                    // Stop action
-                    unit.action_state = ActionState::Cooldown {
-                        time_left: unit.action.cooldown,
-                    };
-                }
-            }
             self.effects.push_front(QueuedEffect { effect, context });
+        }
+
+        if looped && unit.animation_state.frame == 0 {
+            if let ActionState::InProgress { .. } = unit.action_state {
+                // Stop action
+                unit.action_state = ActionState::Cooldown {
+                    time_left: unit.action.cooldown,
+                };
+                unit.animation_state = AnimationState::new(&unit.idle_animation).0;
+            }
         }
     }
 }
