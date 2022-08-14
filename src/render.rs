@@ -25,7 +25,7 @@ impl Render {
         for unit in &model.units {
             unit.animation_state
                 .get_sprite()
-                .draw(unit.position, geng, framebuffer, camera);
+                .draw(unit.position, unit.flip_sprite, geng, framebuffer, camera);
         }
 
         // Draw projectiles

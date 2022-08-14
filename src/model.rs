@@ -87,6 +87,7 @@ pub struct Unit {
     pub target_velocity: Velocity,
     pub action: Action,
     pub action_state: ActionState,
+    pub flip_sprite: bool,
     pub animation_state: AnimationState,
     pub idle_animation: Rc<Animation>,
 }

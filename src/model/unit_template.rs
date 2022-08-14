@@ -29,6 +29,7 @@ impl UnitTemplate {
             action_state: ActionState::Ready,
             animation_state: AnimationState::new(&self.idle_animation).0,
             idle_animation: self.idle_animation,
+            flip_sprite: false,
         }
     }
 }

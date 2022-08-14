@@ -15,5 +15,11 @@ impl Logic<'_> {
             unit.position.y = Coord::ZERO;
             unit.velocity.y = Coord::ZERO;
         }
+
+        unit.flip_sprite = match unit.velocity.x.cmp(&Coord::ZERO) {
+            std::cmp::Ordering::Less => true,
+            std::cmp::Ordering::Equal => unit.flip_sprite,
+            std::cmp::Ordering::Greater => false,
+        };
     }
 }
