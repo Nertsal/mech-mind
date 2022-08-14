@@ -7,6 +7,7 @@ pub enum Effect {
     Projectile(Box<ProjectileEffect>),
     Damage(Box<DamageEffect>),
     Heal(Box<HealEffect>),
+    Dash(Box<DashEffect>),
 }
 
 #[derive(Debug, Clone)]
@@ -36,6 +37,13 @@ pub struct HealEffect {
     pub value: Hp,
 }
 
+#[derive(Debug, Clone)]
+pub struct DashEffect {
+    pub speed: Coord,
+    pub duration: Time,
+    pub on_contact: Effect,
+}
+
 impl Effect {
     pub fn process(self, context: EffectContext, logic: &mut Logic) {
         match self {
@@ -47,6 +55,9 @@ impl Effect {
                 effect.process(context, logic);
             }
             Effect::Heal(effect) => {
+                effect.process(context, logic);
+            }
+            Effect::Dash(effect) => {
                 effect.process(context, logic);
             }
         }
@@ -189,5 +200,22 @@ impl HealEffect {
             position: target_position,
             animation_state: AnimationState::new(&animation).0,
         });
+    }
+}
+
+impl DashEffect {
+    pub fn process(self, context: EffectContext, logic: &mut Logic) {
+        let target_pos = context.get(Who::Target, logic).map(|unit| unit.position);
+        let caster = context.get_mut_expect(Who::Caster, logic);
+
+        let target_dir = target_pos
+            .map(|pos| (pos - caster.position).x.signum())
+            .unwrap_or_else(|| Coord::new(if caster.flip_sprite { -1.0 } else { 1.0 }));
+        let target_velocity = vec2(target_dir, Coord::ZERO) * self.speed;
+        caster.velocity = target_velocity;
+        caster.statuses.push(Status::Charge {
+            time: self.duration,
+            on_contact: self.on_contact,
+        })
     }
 }

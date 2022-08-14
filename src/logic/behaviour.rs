@@ -8,20 +8,20 @@ impl Logic<'_> {
     fn process_unit_behaviour(&mut self, unit: &mut Unit) {
         match &unit.ai {
             UnitAI::Idle => {}
-            UnitAI::Engage(ai) => {
-                let target = match ai {
+            UnitAI::Engage { target, .. } => {
+                let target = match target {
                     TargetAI::Closest => self
                         .model
                         .units
                         .iter()
                         .filter(|other| other.faction != unit.faction)
-                        .min_by_key(|enemy| (unit.position - enemy.position).len_sqr()),
+                        .min_by_key(|other| (unit.position - other.position).len_sqr()),
                     TargetAI::LowestHp => self
                         .model
                         .units
                         .iter()
                         .filter(|other| other.faction == unit.faction)
-                        .min_by_key(|enemy| enemy.health.hp),
+                        .min_by_key(|other| other.health.hp),
                 };
                 if let Some(target) = target {
                     let distance = (target.position - unit.position).len();

@@ -13,6 +13,14 @@ impl Logic<'_> {
                 *time_left -= self.delta_time;
                 if *time_left <= Time::ZERO {
                     unit.action_state = ActionState::Ready;
+                    if let UnitAI::Engage {
+                        switch: Some(switch),
+                        ..
+                    } = &unit.ai
+                    {
+                        unit.action = switch.next_action.clone();
+                        unit.ai = (*switch.next_ai).clone();
+                    }
                 }
             }
         }

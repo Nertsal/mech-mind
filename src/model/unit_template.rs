@@ -26,12 +26,13 @@ impl UnitTemplate {
             speed: self.speed,
             acceleration: self.acceleration,
             target_velocity: Velocity::ZERO,
+            statuses: default(),
             action: self.action,
             action_state: ActionState::Ready,
+            flip_sprite: false,
             animation_state: AnimationState::new(&self.idle_animation).0,
             idle_animation: self.idle_animation,
             move_animation: self.move_animation,
-            flip_sprite: false,
             extra_render: self.extra_render,
         }
     }
@@ -96,7 +97,10 @@ fn tank(assets: &Rc<Assets>) -> UnitTemplate {
         )),
     );
     UnitTemplate {
-        ai: UnitAI::Engage(TargetAI::Closest),
+        ai: UnitAI::Engage {
+            target: TargetAI::Closest,
+            switch: None,
+        },
         health: Health::new(Hp::new(10.0)),
         sanity: Some(Health::new(Hp::new(100.0))),
         collider: Collider::Aabb {
@@ -156,7 +160,10 @@ fn artillery(assets: &Rc<Assets>) -> UnitTemplate {
         )),
     );
     UnitTemplate {
-        ai: UnitAI::Engage(TargetAI::Closest),
+        ai: UnitAI::Engage {
+            target: TargetAI::Closest,
+            switch: None,
+        },
         health: Health::new(Hp::new(10.0)),
         sanity: None,
         collider: Collider::Aabb {
@@ -195,7 +202,10 @@ fn healer(assets: &Rc<Assets>) -> UnitTemplate {
         )),
     );
     UnitTemplate {
-        ai: UnitAI::Engage(TargetAI::LowestHp),
+        ai: UnitAI::Engage {
+            target: TargetAI::LowestHp,
+            switch: None,
+        },
         health: Health::new(Hp::new(10.0)),
         sanity: None,
         collider: Collider::Aabb {
@@ -251,7 +261,10 @@ fn blighter(assets: &Rc<Assets>) -> UnitTemplate {
         )),
     );
     UnitTemplate {
-        ai: UnitAI::Engage(TargetAI::Closest),
+        ai: UnitAI::Engage {
+            target: TargetAI::Closest,
+            switch: None,
+        },
         health: Health::new(Hp::new(10.0)),
         sanity: None,
         collider: Collider::Aabb {
@@ -283,25 +296,86 @@ fn ravager(assets: &Rc<Assets>) -> UnitTemplate {
         Time::ONE,
         None,
     );
-    let animation = to_animation(
-        &assets.enemies.ravager.attack,
+    let roar = to_animation(
+        &assets.enemies.ravager.roar,
+        vec2(2.0, 2.0),
+        Time::ONE,
+        None,
+    );
+    let anticipation = to_animation(
+        &assets.enemies.ravager.anticipation,
+        vec2(2.0, 2.0),
+        Time::ONE,
+        None,
+    );
+    let charge = to_animation(
+        &assets.enemies.ravager.charge,
+        vec2(2.0, 2.0),
+        Time::ONE,
+        Some((
+            1,
+            Effect::Dash(Box::new(DashEffect {
+                speed: Coord::new(15.0),
+                duration: Time::new(0.5),
+                on_contact: Effect::Damage(Box::new(DamageEffect {
+                    damage_type: DamageType::Physical,
+                    value: Hp::new(5.0),
+                })),
+            })),
+        )),
+    );
+    let attack = to_animation(
+        &assets.enemies.ravager.charge,
         vec2(2.0, 2.0),
         Time::ONE,
         None,
     );
     UnitTemplate {
-        ai: UnitAI::Engage(TargetAI::Closest),
+        ai: UnitAI::Engage {
+            target: TargetAI::Closest,
+            switch: Some(SwitchAction {
+                next_action: Action {
+                    cooldown: Time::ZERO,
+                    engage_radius: Coord::new(10.0),
+                    animation: anticipation,
+                },
+                next_ai: Box::new(UnitAI::Engage {
+                    target: TargetAI::Closest,
+                    switch: Some(SwitchAction {
+                        next_action: Action {
+                            cooldown: Time::new(2.0),
+                            engage_radius: Coord::new(10.0),
+                            animation: charge,
+                        },
+                        next_ai: Box::new(UnitAI::Engage {
+                            target: TargetAI::Closest,
+                            switch: Some(SwitchAction {
+                                next_action: Action {
+                                    cooldown: Time::new(1.0),
+                                    engage_radius: Coord::new(3.0),
+                                    animation: attack,
+                                },
+                                next_ai: Box::new(UnitAI::Engage {
+                                    target: TargetAI::Closest,
+                                    switch: None,
+                                }),
+                            }),
+                        }),
+                    }),
+                }),
+            }),
+        },
         health: Health::new(Hp::new(10.0)),
         sanity: None,
         collider: Collider::Aabb {
-            size: vec2(1.0, 2.0).map(Coord::new),
+            size: vec2(2.0, 1.0).map(Coord::new),
         },
         speed: Coord::new(2.0),
         acceleration: Coord::new(10.0),
         action: Action {
-            cooldown: Time::new(1.0),
-            engage_radius: Coord::new(7.0),
-            animation,
+            cooldown: Time::ZERO,
+            engage_radius: Coord::new(10.0),
+            animation: roar,
         },
         idle_animation,
         move_animation,

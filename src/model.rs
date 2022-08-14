@@ -45,6 +45,14 @@ pub struct Particle {
     pub animation_state: AnimationState,
 }
 
+#[derive(Debug, Clone)]
+pub enum Status {
+    Charge {
+        time: Time,
+        on_contact: Effect,
+    }
+}
+
 pub struct UnitTemplates {
     pub artillery: UnitTemplate,
     pub tank: UnitTemplate,
@@ -61,8 +69,17 @@ pub enum Faction {
 
 #[derive(Debug, Clone)]
 pub enum UnitAI {
-    Engage(TargetAI),
     Idle,
+    Engage {
+        target: TargetAI,
+        switch: Option<SwitchAction>,
+    },
+}
+
+#[derive(Debug, Clone)]
+pub struct SwitchAction {
+    pub next_action: Action,
+    pub next_ai: Box<UnitAI>,
 }
 
 #[derive(Debug, Clone)]
@@ -81,7 +98,7 @@ pub enum ProjectileAI {
     },
 }
 
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct Action {
     pub cooldown: Time,
     pub engage_radius: Coord,
@@ -119,6 +136,7 @@ pub struct Unit {
     pub speed: Coord,
     pub acceleration: Coord,
     pub target_velocity: Velocity,
+    pub statuses: Vec<Status>,
     pub action: Action,
     pub action_state: ActionState,
     pub flip_sprite: bool,

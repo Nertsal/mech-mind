@@ -10,6 +10,7 @@ mod effects;
 mod movement;
 mod projectiles;
 mod particles;
+mod statuses;
 
 pub use effects::*;
 
@@ -37,6 +38,7 @@ impl Model {
 
 impl Logic<'_> {
     fn process(&mut self) {
+        self.process_statuses();
         self.process_behaviour();
         self.process_animations();
         self.process_actions();
