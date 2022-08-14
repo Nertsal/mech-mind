@@ -6,8 +6,10 @@ mod id;
 mod collider;
 mod sprite;
 mod health;
+mod animation;
 
 pub use effect::*;
+pub use animation::*;
 pub use collider::*;
 pub use health::*;
 pub use id::*;
@@ -48,14 +50,12 @@ pub enum TargetAI {
 pub struct Action {
     pub cooldown: Time,
     pub engage_radius: Coord,
-    // TODO
-    // pub animation: Animation,
-    pub effect: Effect,
+    pub animation: Rc<Animation>,
 }
 
 pub enum ActionState {
     Ready,
-    InProgress { target: Option<Id> }, // TODO: Animation
+    InProgress { target: Option<Id> },
     Cooldown { time_left: Time },
 }
 
@@ -66,7 +66,6 @@ pub struct Unit {
     pub ai: UnitAI,
     pub health: Health,
     pub sanity: Option<Health>,
-    pub sprite: Sprite,
     pub collider: Collider,
     pub position: Position,
     pub velocity: Velocity,
@@ -75,6 +74,7 @@ pub struct Unit {
     pub target_velocity: Velocity,
     pub action: Action,
     pub action_state: ActionState,
+    pub animation_state: AnimationState,
 }
 
 #[derive(HasId)]

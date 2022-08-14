@@ -23,7 +23,9 @@ impl Render {
 
         // Draw units
         for unit in &model.units {
-            unit.sprite.draw(unit.position, geng, framebuffer, camera);
+            unit.animation_state
+                .get_sprite()
+                .draw(unit.position, geng, framebuffer, camera);
         }
 
         // Draw projectiles
