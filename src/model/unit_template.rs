@@ -30,6 +30,7 @@ impl UnitTemplate {
             animation_state: AnimationState::new(&self.idle_animation).0,
             idle_animation: self.idle_animation,
             flip_sprite: false,
+            extra_render: self.extra_render,
         }
     }
 }
@@ -99,6 +100,11 @@ fn tank(assets: &Rc<Assets>) -> UnitTemplate {
             animation,
         },
         idle_animation,
+        extra_render: Some(ExtraUnitRender::Tank {
+            hand_pos: vec2(-0.4, 0.6).map(Coord::new),
+            weapon_pos: vec2(0.6, 0.5).map(Coord::new),
+            rotation: Coord::new(-f32::PI / 2.0),
+        }),
     }
 }
 
@@ -130,6 +136,7 @@ fn artillery(assets: &Rc<Assets>) -> UnitTemplate {
             animation,
         },
         idle_animation,
+        extra_render: None,
     }
 }
 
@@ -161,6 +168,7 @@ fn healer(assets: &Rc<Assets>) -> UnitTemplate {
             animation: idle_animation.clone(),
         },
         idle_animation,
+        extra_render: None,
     }
 }
 
@@ -192,5 +200,6 @@ fn blighter(assets: &Rc<Assets>) -> UnitTemplate {
             animation,
         },
         idle_animation,
+        extra_render: None,
     }
 }

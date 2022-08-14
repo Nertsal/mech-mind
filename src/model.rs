@@ -72,6 +72,16 @@ pub enum ActionState {
     Cooldown { time_left: Time },
 }
 
+#[derive(Clone)]
+pub enum ExtraUnitRender {
+    Tank {
+        hand_pos: Position,
+        weapon_pos: Position,
+        /// Default is 0 degrees directed to the right
+        rotation: Coord,
+    }
+}
+
 #[derive(HasId, Clone)]
 pub struct Unit {
     pub id: Id,
@@ -90,6 +100,7 @@ pub struct Unit {
     pub flip_sprite: bool,
     pub animation_state: AnimationState,
     pub idle_animation: Rc<Animation>,
+    pub extra_render: Option<ExtraUnitRender>,
 }
 
 #[derive(Clone)]
@@ -102,6 +113,7 @@ pub struct UnitTemplate {
     pub acceleration: Coord,
     pub action: Action,
     pub idle_animation: Rc<Animation>,
+    pub extra_render: Option<ExtraUnitRender>,
 }
 
 #[derive(HasId)]
