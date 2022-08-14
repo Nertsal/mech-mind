@@ -6,6 +6,7 @@ pub enum Effect {
     Noop,
     Projectile(Box<ProjectileEffect>),
     Damage(Box<DamageEffect>),
+    Heal(Box<HealEffect>),
 }
 
 #[derive(Debug, Clone)]
@@ -30,6 +31,11 @@ pub struct DamageEffect {
     pub value: Hp,
 }
 
+#[derive(Debug, Clone)]
+pub struct HealEffect {
+    pub value: Hp,
+}
+
 impl Effect {
     pub fn process(self, context: EffectContext, logic: &mut Logic) {
         match self {
@@ -38,6 +44,9 @@ impl Effect {
                 effect.process(context, logic);
             }
             Effect::Damage(effect) => {
+                effect.process(context, logic);
+            }
+            Effect::Heal(effect) => {
                 effect.process(context, logic);
             }
         }
@@ -159,5 +168,12 @@ impl DamageEffect {
     pub fn process(self, context: EffectContext, logic: &mut Logic) {
         let target = context.get_mut_expect(Who::Target, logic);
         target.health.change(-self.value); // TODO: account for different damage types
+    }
+}
+
+impl HealEffect {
+    pub fn process(self, context: EffectContext, logic: &mut Logic) {
+        let target = context.get_mut_expect(Who::Target, logic);
+        target.health.change(self.value);
     }
 }

@@ -182,14 +182,19 @@ fn healer(assets: &Rc<Assets>) -> UnitTemplate {
         None,
     );
     let move_animation = to_animation(&assets.mech.healer.walk, vec2(2.0, 2.0), Time::ONE, None);
-    // let animation = to_animation(
-    //     &assets.mech.healer.heal,
-    //     vec2(2.0, 2.0),
-    //     Time::ONE,
-    //     None, // TODO: set action
-    // );
+    let animation = to_animation(
+        &assets.mech.healer.heal,
+        vec2(2.0, 2.0),
+        Time::ONE,
+        Some((
+            5,
+            Effect::Heal(Box::new(HealEffect {
+                value: Hp::new(5.0),
+            })),
+        )),
+    );
     UnitTemplate {
-        ai: UnitAI::Idle,
+        ai: UnitAI::Engage(TargetAI::LowestHp),
         health: Health::new(Hp::new(10.0)),
         sanity: None,
         collider: Collider::Aabb {
@@ -198,9 +203,9 @@ fn healer(assets: &Rc<Assets>) -> UnitTemplate {
         speed: Coord::new(2.0),
         acceleration: Coord::new(10.0),
         action: Action {
-            cooldown: Time::new(1.0),
+            cooldown: Time::new(2.0),
             engage_radius: Coord::new(5.0),
-            animation: idle_animation.clone(),
+            animation,
         },
         idle_animation,
         move_animation,

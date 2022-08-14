@@ -8,40 +8,29 @@ impl Logic<'_> {
     fn process_unit_behaviour(&mut self, unit: &mut Unit) {
         match &unit.ai {
             UnitAI::Idle => {}
-            UnitAI::Engage(ai) => match ai {
-                TargetAI::Closest => {
-                    let target = self
+            UnitAI::Engage(ai) => {
+                let target = match ai {
+                    TargetAI::Closest => self
                         .model
                         .units
                         .iter()
                         .filter(|other| other.faction != unit.faction)
-                        .min_by_key(|enemy| (unit.position - enemy.position).len_sqr());
-                    if let Some(target) = target {
-                        let distance = (target.position - unit.position).len();
-                        if distance > unit.action.engage_radius {
-                            // Go towards the target
-                            let vx = (target.position.x - unit.position.x).clamp_abs(unit.speed);
-                            unit.target_velocity = vec2(vx, unit.velocity.y);
-                            if !Rc::ptr_eq(&unit.animation_state.animation, &unit.move_animation) {
-                                let (state, effect) = AnimationState::new(&unit.move_animation);
-                                unit.animation_state = state;
-                                if let Some(effect) = effect {
-                                    self.effects.push_front(QueuedEffect {
-                                        effect,
-                                        context: EffectContext {
-                                            caster: Some(unit.id),
-                                            target: Some(target.id),
-                                        },
-                                    })
-                                }
-                            }
-                            return;
-                        } else if let ActionState::Ready = unit.action_state {
-                            // The target is in range -> attack
-                            unit.action_state = ActionState::InProgress {
-                                target: Some(target.id),
-                            };
-                            let (state, effect) = AnimationState::new(&unit.action.animation);
+                        .min_by_key(|enemy| (unit.position - enemy.position).len_sqr()),
+                    TargetAI::LowestHp => self
+                        .model
+                        .units
+                        .iter()
+                        .filter(|other| other.faction == unit.faction)
+                        .min_by_key(|enemy| enemy.health.hp),
+                };
+                if let Some(target) = target {
+                    let distance = (target.position - unit.position).len();
+                    if distance > unit.action.engage_radius {
+                        // Go towards the target
+                        let vx = (target.position.x - unit.position.x).clamp_abs(unit.speed);
+                        unit.target_velocity = vec2(vx, unit.velocity.y);
+                        if !Rc::ptr_eq(&unit.animation_state.animation, &unit.move_animation) {
+                            let (state, effect) = AnimationState::new(&unit.move_animation);
                             unit.animation_state = state;
                             if let Some(effect) = effect {
                                 self.effects.push_front(QueuedEffect {
@@ -53,9 +42,26 @@ impl Logic<'_> {
                                 })
                             }
                         }
+                        return;
+                    } else if let ActionState::Ready = unit.action_state {
+                        // The target is in range -> attack
+                        unit.action_state = ActionState::InProgress {
+                            target: Some(target.id),
+                        };
+                        let (state, effect) = AnimationState::new(&unit.action.animation);
+                        unit.animation_state = state;
+                        if let Some(effect) = effect {
+                            self.effects.push_front(QueuedEffect {
+                                effect,
+                                context: EffectContext {
+                                    caster: Some(unit.id),
+                                    target: Some(target.id),
+                                },
+                            })
+                        }
                     }
                 }
-            },
+            }
         }
         unit.target_velocity = vec2(Coord::ZERO, unit.velocity.y);
 

@@ -56,6 +56,7 @@ pub enum UnitAI {
 #[derive(Debug, Clone)]
 pub enum TargetAI {
     Closest,
+    LowestHp,
 }
 
 #[derive(Debug, Clone)]
