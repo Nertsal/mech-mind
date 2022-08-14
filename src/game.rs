@@ -60,6 +60,13 @@ impl geng::State for Game {
                         Faction::Alien,
                     );
                 }
+                geng::Key::Num7 => {
+                    self.model.spawn_unit(
+                        self.model.templates.ravager.clone(),
+                        vec2(15.0, 5.0).map(Coord::new),
+                        Faction::Alien,
+                    );
+                }
                 _ => {}
             },
             _ => {}

@@ -7,6 +7,7 @@ impl UnitTemplates {
             tank: tank(assets),
             healer: healer(assets),
             blighter: blighter(assets),
+            ravager: ravager(assets),
         }
     }
 }
@@ -248,6 +249,45 @@ fn blighter(assets: &Rc<Assets>) -> UnitTemplate {
                 ),
             })),
         )),
+    );
+    UnitTemplate {
+        ai: UnitAI::Engage(TargetAI::Closest),
+        health: Health::new(Hp::new(10.0)),
+        sanity: None,
+        collider: Collider::Aabb {
+            size: vec2(1.0, 2.0).map(Coord::new),
+        },
+        speed: Coord::new(2.0),
+        acceleration: Coord::new(10.0),
+        action: Action {
+            cooldown: Time::new(1.0),
+            engage_radius: Coord::new(7.0),
+            animation,
+        },
+        idle_animation,
+        move_animation,
+        extra_render: None,
+    }
+}
+
+fn ravager(assets: &Rc<Assets>) -> UnitTemplate {
+    let idle_animation = to_animation(
+        &[assets.enemies.ravager.idle.clone()],
+        vec2(2.0, 2.0),
+        Time::ONE,
+        None,
+    );
+    let move_animation = to_animation(
+        &assets.enemies.ravager.walk,
+        vec2(2.0, 2.0),
+        Time::ONE,
+        None,
+    );
+    let animation = to_animation(
+        &assets.enemies.ravager.attack,
+        vec2(2.0, 2.0),
+        Time::ONE,
+        None,
     );
     UnitTemplate {
         ai: UnitAI::Engage(TargetAI::Closest),

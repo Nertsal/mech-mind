@@ -20,6 +20,8 @@ pub struct EffectAssets {
 #[derive(geng::Assets)]
 pub struct EnemyAssets {
     pub blighter: BlighterEnemy,
+    pub ravager: RavagerEnemy,
+    pub stinger: StingerEnemy,
 }
 
 #[derive(geng::Assets)]
@@ -41,13 +43,13 @@ pub struct BlighterEnemy {
 
 #[derive(geng::Assets)]
 pub struct RavagerEnemy {
-    #[asset(range = "1..=7", path = "attack/*.png")]
+    #[asset(range = "1..=7", path = "anticipation/*.png")]
     pub anticipation: Vec<PixelTexture>,
     #[asset(range = "1..=5", path = "attack/*.png")]
     pub attack: Vec<PixelTexture>,
-    #[asset(range = "1..=2", path = "attack/*.png")]
+    #[asset(range = "1..=2", path = "charge/*.png")]
     pub charge: Vec<PixelTexture>,
-    #[asset(range = "1..=20", path = "attack/*.png")]
+    #[asset(range = "1..=20", path = "roar/*.png")]
     pub roar: Vec<PixelTexture>,
     #[asset(range = "1..=5", path = "walk/*.png")]
     pub walk: Vec<PixelTexture>,

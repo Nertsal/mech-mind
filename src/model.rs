@@ -50,6 +50,7 @@ pub struct UnitTemplates {
     pub tank: UnitTemplate,
     pub healer: UnitTemplate,
     pub blighter: UnitTemplate,
+    pub ravager: UnitTemplate,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
