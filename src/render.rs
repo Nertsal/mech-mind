@@ -21,17 +21,6 @@ impl Render {
         let geng = &self.geng;
         let camera = &model.camera;
 
-        {
-            let mouse = self.geng.window().mouse_pos().map(|x| x as f32);
-            let mouse = camera.screen_to_world(framebuffer.size().map(|x| x as f32), mouse);
-            draw_2d::Text::unit(
-                self.geng.default_font().clone(),
-                format!("Mouse at ({:.2}, {:.2})", mouse.x, mouse.y),
-                Color::WHITE,
-            )
-            .draw_2d(geng, framebuffer, camera);
-        }
-
         // Draw units
         for unit in &model.units {
             draw_sprite(
@@ -51,24 +40,34 @@ impl Render {
                         rotation,
                         ..
                     } => {
+                        let mut rotation = *rotation;
+                        let mut hand = *hand_pos;
+                        if unit.flip_sprite {
+                            rotation = -rotation;
+                            hand.x = -hand.x;
+                        }
                         draw_sprite(
                             &Sprite {
                                 texture: self.assets.mech.tank.hand.texture(),
                                 size: vec2(2.0, 2.0 * 9.0 / 62.0),
                             },
-                            unit.position + *hand_pos,
+                            unit.position + hand,
                             unit.flip_sprite,
                             rotation.as_f32(),
                             geng,
                             framebuffer,
                             camera,
                         );
+                        let mut weapon = *weapon_pos;
+                        if unit.flip_sprite {
+                            weapon.x = -weapon.x;
+                        }
                         draw_sprite(
                             &Sprite {
                                 texture: self.assets.mech.tank.weapon.texture(),
                                 size: vec2(1.0, 1.0 * 14.0 / 31.0),
                             },
-                            unit.position + *hand_pos + weapon_pos.rotate(*rotation),
+                            unit.position + hand + weapon.rotate(rotation),
                             unit.flip_sprite,
                             rotation.as_f32(),
                             geng,

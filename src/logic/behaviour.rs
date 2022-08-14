@@ -68,13 +68,20 @@ impl Logic<'_> {
                         .find(|frame| matches!(frame.start_effect, Some(Effect::Projectile(_))))
                     {
                         if let Some(Effect::Projectile(effect)) = &frame.start_effect {
-                            let offset = *hand_pos + (*weapon_pos + *shoot_pos).rotate(*rotation);
+                            let mut offset =
+                                *hand_pos + (*weapon_pos + *shoot_pos).rotate(*rotation);
+                            if unit.flip_sprite {
+                                offset.x = -offset.x;
+                            }
                             if let Some((dir, _)) = aim_parabollically(
                                 target_pos - (unit.position + offset),
                                 self.model.gravity.y,
                                 effect.speed,
                             ) {
-                                let angle = dir.arg();
+                                let mut angle = dir.arg();
+                                if unit.flip_sprite {
+                                    angle = Coord::PI - angle;
+                                }
                                 *rotation += (angle - *rotation)
                                     .clamp_abs(Coord::new(10.0) * self.delta_time);
                                 // TODO: remove magic constant
