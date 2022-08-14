@@ -28,6 +28,17 @@ impl Logic<'_> {
                             unit.action_state = ActionState::InProgress {
                                 target: Some(target.id),
                             };
+                            let (state, effect) = AnimationState::new(&unit.action.animation);
+                            unit.animation_state = state;
+                            if let Some(effect) = effect {
+                                self.effects.push_front(QueuedEffect {
+                                    effect,
+                                    context: EffectContext {
+                                        caster: Some(unit.id),
+                                        target: Some(target.id),
+                                    },
+                                })
+                            }
                         }
                     }
                 }

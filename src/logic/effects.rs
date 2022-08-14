@@ -64,7 +64,7 @@ impl EffectContext {
         let id = self.id_expect(who);
         logic.model.units.get(&id).unwrap_or_else(|| {
             panic!(
-                "In the context {:?}, attempted to find {:?}, which have id {:?}, but they are present in the model",
+                "In the context {:?}, attempted to find {:?}, which have id {:?}, but they are not present in the model",
                 self, who, id
             )
         })
@@ -74,7 +74,7 @@ impl EffectContext {
         let id = self.id_expect(who);
         logic.model.units.get_mut(&id).unwrap_or_else(|| {
             panic!(
-                "In the context {:?}, attempted to find {:?}, which have id {:?}, but they are present in the model",
+                "In the context {:?}, attempted to find {:?}, which have id {:?}, but they are not present in the model",
                 self, who, id
             )
         })

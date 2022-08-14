@@ -29,9 +29,16 @@ impl geng::State for Game {
     }
 
     fn handle_event(&mut self, event: geng::Event) {
+        #[allow(clippy::single_match)]
         match event {
             geng::Event::KeyDown { key } => match key {
                 geng::Key::G => {
+                    let idle_animation = to_animation(
+                        &[self.assets.mech.tank.idle.clone()],
+                        vec2(2.0, 2.0),
+                        Time::ONE,
+                        None,
+                    );
                     let animation = to_animation(
                         &self.assets.mech.tank.attack,
                         vec2(2.0, 2.0),
@@ -62,18 +69,25 @@ impl geng::State for Game {
                         speed: Coord::new(2.0),
                         acceleration: Coord::new(10.0),
                         target_velocity: Velocity::ZERO,
-                        animation_state: AnimationState::new(&animation).0,
+                        animation_state: AnimationState::new(&idle_animation).0,
                         action: Action {
                             cooldown: Time::new(1.0),
                             engage_radius: Coord::new(10.0),
                             animation,
                         },
                         action_state: ActionState::Ready,
+                        idle_animation,
                     });
                 }
                 geng::Key::H => {
                     let animation = to_animation(
                         &self.assets.mech.artillery.attack,
+                        vec2(2.0, 2.0),
+                        Time::ONE,
+                        None,
+                    );
+                    let idle_animation = to_animation(
+                        &[self.assets.mech.artillery.idle.clone()],
                         vec2(2.0, 2.0),
                         Time::ONE,
                         None,
@@ -92,13 +106,14 @@ impl geng::State for Game {
                         speed: Coord::new(2.0),
                         acceleration: Coord::new(10.0),
                         target_velocity: Velocity::ZERO,
-                        animation_state: AnimationState::new(&animation).0,
+                        animation_state: AnimationState::new(&idle_animation).0,
                         action: Action {
                             cooldown: Time::new(1.0),
                             engage_radius: Coord::new(2.0),
                             animation,
                         },
                         action_state: ActionState::Ready,
+                        idle_animation,
                     });
                 }
                 _ => {}
@@ -119,17 +134,16 @@ fn to_animation(
     cycle_time: Time,
     action: Option<(usize, Effect)>,
 ) -> Rc<Animation> {
+    let time = cycle_time / Time::new(textures.len() as f32);
     Rc::new(Animation {
         keyframes: {
-            let time = cycle_time / Time::new(textures.len() as f32);
-            let attack_frame = 2;
             textures
                 .iter()
                 .enumerate()
                 .map(|(frame, texture)| AnimationFrame {
                     sprite: Sprite {
                         texture: texture.texture(),
-                        size: vec2(2.0, 2.0),
+                        size: sprite_size,
                     },
                     time,
                     start_effect: action.as_ref().and_then(|(action_frame, action)| {
