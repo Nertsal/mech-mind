@@ -77,6 +77,7 @@ pub enum ExtraUnitRender {
     Tank {
         hand_pos: Position,
         weapon_pos: Position,
+        shoot_pos: Position,
         /// Default is 0 degrees directed to the right
         rotation: Coord,
     }

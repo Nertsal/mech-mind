@@ -46,7 +46,18 @@ impl ProjectileEffect {
     pub fn process(self, context: EffectContext, logic: &mut Logic) -> Option<()> {
         let caster = context.get_expect(Who::Caster, logic);
         let target = context.get(Who::Target, logic)?;
-        let position = self.offset + caster.position;
+        let offset = if let Some(ExtraUnitRender::Tank {
+            hand_pos,
+            weapon_pos,
+            shoot_pos,
+            rotation,
+        }) = caster.extra_render
+        {
+            hand_pos + (weapon_pos + shoot_pos).rotate(rotation)
+        } else {
+            self.offset
+        };
+        let position = offset + caster.position;
 
         // Use simple prediction for better aim
         let delta = target.position - position;

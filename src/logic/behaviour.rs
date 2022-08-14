@@ -54,6 +54,7 @@ impl Logic<'_> {
                 if let Some(ExtraUnitRender::Tank {
                     hand_pos,
                     weapon_pos,
+                    shoot_pos,
                     rotation,
                 }) = &mut unit.extra_render
                 {
@@ -67,7 +68,7 @@ impl Logic<'_> {
                         .find(|frame| matches!(frame.start_effect, Some(Effect::Projectile(_))))
                     {
                         if let Some(Effect::Projectile(effect)) = &frame.start_effect {
-                            let offset = *hand_pos + weapon_pos.rotate(*rotation);
+                            let offset = *hand_pos + (*weapon_pos + *shoot_pos).rotate(*rotation);
                             if let Some((dir, _)) = aim_parabollically(
                                 target_pos - (unit.position + offset),
                                 self.model.gravity.y,

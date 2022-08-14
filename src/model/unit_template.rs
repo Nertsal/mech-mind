@@ -103,6 +103,7 @@ fn tank(assets: &Rc<Assets>) -> UnitTemplate {
         extra_render: Some(ExtraUnitRender::Tank {
             hand_pos: vec2(-0.4, 0.5).map(Coord::new),
             weapon_pos: vec2(1.2, 0.1).map(Coord::new),
+            shoot_pos: vec2(0.5, 0.0).map(Coord::new),
             rotation: Coord::ZERO,
         }),
     }

@@ -49,6 +49,7 @@ impl Render {
                         hand_pos,
                         weapon_pos,
                         rotation,
+                        ..
                     } => {
                         draw_sprite(
                             &Sprite {
