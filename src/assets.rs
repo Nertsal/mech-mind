@@ -6,8 +6,15 @@ pub use pixel_texture::*;
 
 #[derive(geng::Assets)]
 pub struct Assets {
+    pub effects: EffectAssets,
     pub enemies: EnemyAssets,
     pub mech: MechAssets,
+}
+
+#[derive(geng::Assets)]
+pub struct EffectAssets {
+    #[asset(range = "1..=14", path = "heal/*.png")]
+    pub heal: Vec<PixelTexture>,
 }
 
 #[derive(geng::Assets)]
@@ -30,6 +37,30 @@ pub struct BlighterEnemy {
     pub walk: Vec<PixelTexture>,
     pub idle: PixelTexture,
     pub projectile: PixelTexture,
+}
+
+#[derive(geng::Assets)]
+pub struct RavagerEnemy {
+    #[asset(range = "1..=7", path = "attack/*.png")]
+    pub anticipation: Vec<PixelTexture>,
+    #[asset(range = "1..=5", path = "attack/*.png")]
+    pub attack: Vec<PixelTexture>,
+    #[asset(range = "1..=2", path = "attack/*.png")]
+    pub charge: Vec<PixelTexture>,
+    #[asset(range = "1..=20", path = "attack/*.png")]
+    pub roar: Vec<PixelTexture>,
+    #[asset(range = "1..=5", path = "walk/*.png")]
+    pub walk: Vec<PixelTexture>,
+    pub idle: PixelTexture,
+}
+
+#[derive(geng::Assets)]
+pub struct StingerEnemy {
+    #[asset(range = "1..=16", path = "attack/*.png")]
+    pub attack: Vec<PixelTexture>,
+    #[asset(range = "1..=5", path = "walk/*.png")]
+    pub walk: Vec<PixelTexture>,
+    pub idle: PixelTexture,
 }
 
 #[derive(geng::Assets)]
