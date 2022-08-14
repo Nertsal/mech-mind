@@ -22,6 +22,19 @@ impl Logic<'_> {
                             // Go towards the target
                             let vx = (target.position.x - unit.position.x).clamp_abs(unit.speed);
                             unit.target_velocity = vec2(vx, unit.velocity.y);
+                            if !Rc::ptr_eq(&unit.animation_state.animation, &unit.move_animation) {
+                                let (state, effect) = AnimationState::new(&unit.move_animation);
+                                unit.animation_state = state;
+                                if let Some(effect) = effect {
+                                    self.effects.push_front(QueuedEffect {
+                                        effect,
+                                        context: EffectContext {
+                                            caster: Some(unit.id),
+                                            target: Some(target.id),
+                                        },
+                                    })
+                                }
+                            }
                             return;
                         } else if let ActionState::Ready = unit.action_state {
                             // The target is in range -> attack
@@ -46,45 +59,52 @@ impl Logic<'_> {
         }
         unit.target_velocity = vec2(Coord::ZERO, unit.velocity.y);
 
-        if let ActionState::InProgress { target } = &unit.action_state {
-            if let Some(target_pos) = target
-                .and_then(|id| self.model.units.get(&id))
-                .map(|unit| unit.position)
-            {
-                if let Some(ExtraUnitRender::Tank {
-                    hand_pos,
-                    weapon_pos,
-                    shoot_pos,
-                    rotation,
-                }) = &mut unit.extra_render
+        match &unit.action_state {
+            ActionState::Ready | ActionState::Cooldown { .. } => {
+                if !Rc::ptr_eq(&unit.animation_state.animation, &unit.idle_animation) {
+                    unit.animation_state = AnimationState::new(&unit.idle_animation).0;
+                }
+            }
+            ActionState::InProgress { target } => {
+                if let Some(target_pos) = target
+                    .and_then(|id| self.model.units.get(&id))
+                    .map(|unit| unit.position)
                 {
-                    // Aim at the target
-                    if let Some(frame) = unit
-                        .animation_state
-                        .animation
-                        .keyframes
-                        .iter()
-                        .skip(unit.animation_state.frame + 1)
-                        .find(|frame| matches!(frame.start_effect, Some(Effect::Projectile(_))))
+                    if let Some(ExtraUnitRender::Tank {
+                        hand_pos,
+                        weapon_pos,
+                        shoot_pos,
+                        rotation,
+                    }) = &mut unit.extra_render
                     {
-                        if let Some(Effect::Projectile(effect)) = &frame.start_effect {
-                            let mut offset =
-                                *hand_pos + (*weapon_pos + *shoot_pos).rotate(*rotation);
-                            if unit.flip_sprite {
-                                offset.x = -offset.x;
-                            }
-                            if let Some((dir, _)) = aim_parabollically(
-                                target_pos - (unit.position + offset),
-                                self.model.gravity.y,
-                                effect.speed,
-                            ) {
-                                let mut angle = dir.arg();
+                        // Aim at the target
+                        if let Some(frame) = unit
+                            .animation_state
+                            .animation
+                            .keyframes
+                            .iter()
+                            .skip(unit.animation_state.frame + 1)
+                            .find(|frame| matches!(frame.start_effect, Some(Effect::Projectile(_))))
+                        {
+                            if let Some(Effect::Projectile(effect)) = &frame.start_effect {
+                                let mut offset =
+                                    *hand_pos + (*weapon_pos + *shoot_pos).rotate(*rotation);
                                 if unit.flip_sprite {
-                                    angle = Coord::PI - angle;
+                                    offset.x = -offset.x;
                                 }
-                                *rotation += (angle - *rotation)
-                                    .clamp_abs(Coord::new(10.0) * self.delta_time);
-                                // TODO: remove magic constant
+                                if let Some((dir, _)) = aim_parabollically(
+                                    target_pos - (unit.position + offset),
+                                    self.model.gravity.y,
+                                    effect.speed,
+                                ) {
+                                    let mut angle = dir.arg();
+                                    if unit.flip_sprite {
+                                        angle = Coord::PI - angle;
+                                    }
+                                    *rotation += (angle - *rotation)
+                                        .clamp_abs(Coord::new(10.0) * self.delta_time);
+                                    // TODO: remove magic constant
+                                }
                             }
                         }
                     }

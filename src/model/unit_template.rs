@@ -29,6 +29,7 @@ impl UnitTemplate {
             action_state: ActionState::Ready,
             animation_state: AnimationState::new(&self.idle_animation).0,
             idle_animation: self.idle_animation,
+            move_animation: self.move_animation,
             flip_sprite: false,
             extra_render: self.extra_render,
         }
@@ -69,6 +70,7 @@ fn tank(assets: &Rc<Assets>) -> UnitTemplate {
         Time::ONE,
         None,
     );
+    let move_animation = to_animation(&assets.mech.tank.walk, vec2(2.0, 2.0), Time::ONE, None);
     let animation = to_animation(
         &assets.mech.tank.attack,
         vec2(2.0, 2.0),
@@ -107,6 +109,7 @@ fn tank(assets: &Rc<Assets>) -> UnitTemplate {
             animation,
         },
         idle_animation,
+        move_animation,
         extra_render: Some(ExtraUnitRender::Tank {
             hand_pos: vec2(-0.4, 0.5).map(Coord::new),
             weapon_pos: vec2(1.2, 0.1).map(Coord::new),
@@ -117,6 +120,13 @@ fn tank(assets: &Rc<Assets>) -> UnitTemplate {
 }
 
 fn artillery(assets: &Rc<Assets>) -> UnitTemplate {
+    let idle_animation = to_animation(
+        &[assets.mech.artillery.idle.clone()],
+        vec2(2.0, 2.0),
+        Time::ONE,
+        None,
+    );
+    let move_animation = to_animation(&assets.mech.artillery.walk, vec2(2.0, 2.0), Time::ONE, None);
     let animation = to_animation(
         &assets.mech.artillery.attack,
         vec2(2.0, 2.0),
@@ -144,12 +154,6 @@ fn artillery(assets: &Rc<Assets>) -> UnitTemplate {
             })),
         )),
     );
-    let idle_animation = to_animation(
-        &[assets.mech.artillery.idle.clone()],
-        vec2(2.0, 2.0),
-        Time::ONE,
-        None,
-    );
     UnitTemplate {
         ai: UnitAI::Engage(TargetAI::Closest),
         health: Health::new(Hp::new(10.0)),
@@ -165,23 +169,25 @@ fn artillery(assets: &Rc<Assets>) -> UnitTemplate {
             animation,
         },
         idle_animation,
+        move_animation,
         extra_render: None,
     }
 }
 
 fn healer(assets: &Rc<Assets>) -> UnitTemplate {
-    // let animation = to_animation(
-    //     &assets.mech.healer.heal,
-    //     vec2(2.0, 2.0),
-    //     Time::ONE,
-    //     None, // TODO: set action
-    // );
     let idle_animation = to_animation(
         &[assets.mech.healer.idle.clone()],
         vec2(2.0, 2.0),
         Time::ONE,
         None,
     );
+    let move_animation = to_animation(&assets.mech.healer.walk, vec2(2.0, 2.0), Time::ONE, None);
+    // let animation = to_animation(
+    //     &assets.mech.healer.heal,
+    //     vec2(2.0, 2.0),
+    //     Time::ONE,
+    //     None, // TODO: set action
+    // );
     UnitTemplate {
         ai: UnitAI::Idle,
         health: Health::new(Hp::new(10.0)),
@@ -197,11 +203,24 @@ fn healer(assets: &Rc<Assets>) -> UnitTemplate {
             animation: idle_animation.clone(),
         },
         idle_animation,
+        move_animation,
         extra_render: None,
     }
 }
 
 fn blighter(assets: &Rc<Assets>) -> UnitTemplate {
+    let idle_animation = to_animation(
+        &[assets.enemies.blighter.idle.clone()],
+        vec2(2.0, 2.0),
+        Time::ONE,
+        None,
+    );
+    let move_animation = to_animation(
+        &assets.enemies.blighter.walk,
+        vec2(2.0, 2.0),
+        Time::ONE,
+        None,
+    );
     let animation = to_animation(
         &assets.enemies.blighter.attack,
         vec2(2.0, 2.0),
@@ -225,12 +244,6 @@ fn blighter(assets: &Rc<Assets>) -> UnitTemplate {
             })),
         )),
     );
-    let idle_animation = to_animation(
-        &[assets.enemies.blighter.idle.clone()],
-        vec2(2.0, 2.0),
-        Time::ONE,
-        None,
-    );
     UnitTemplate {
         ai: UnitAI::Engage(TargetAI::Closest),
         health: Health::new(Hp::new(10.0)),
@@ -246,6 +259,7 @@ fn blighter(assets: &Rc<Assets>) -> UnitTemplate {
             animation,
         },
         idle_animation,
+        move_animation,
         extra_render: None,
     }
 }

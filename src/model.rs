@@ -111,6 +111,7 @@ pub struct Unit {
     pub flip_sprite: bool,
     pub animation_state: AnimationState,
     pub idle_animation: Rc<Animation>,
+    pub move_animation: Rc<Animation>,
     pub extra_render: Option<ExtraUnitRender>,
 }
 
@@ -124,6 +125,7 @@ pub struct UnitTemplate {
     pub acceleration: Coord,
     pub action: Action,
     pub idle_animation: Rc<Animation>,
+    pub move_animation: Rc<Animation>,
     pub extra_render: Option<ExtraUnitRender>,
 }
 
