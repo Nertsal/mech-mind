@@ -45,5 +45,43 @@ impl Logic<'_> {
             },
         }
         unit.target_velocity = vec2(Coord::ZERO, unit.velocity.y);
+
+        if let ActionState::InProgress { target } = &unit.action_state {
+            if let Some(target_pos) = target
+                .and_then(|id| self.model.units.get(&id))
+                .map(|unit| unit.position)
+            {
+                if let Some(ExtraUnitRender::Tank {
+                    hand_pos,
+                    weapon_pos,
+                    rotation,
+                }) = &mut unit.extra_render
+                {
+                    // Aim at the target
+                    if let Some(frame) = unit
+                        .animation_state
+                        .animation
+                        .keyframes
+                        .iter()
+                        .skip(unit.animation_state.frame + 1)
+                        .find(|frame| matches!(frame.start_effect, Some(Effect::Projectile(_))))
+                    {
+                        if let Some(Effect::Projectile(effect)) = &frame.start_effect {
+                            let offset = *hand_pos + weapon_pos.rotate(*rotation);
+                            if let Some((dir, _)) = aim_parabollically(
+                                target_pos - (unit.position + offset),
+                                self.model.gravity.y,
+                                effect.speed,
+                            ) {
+                                let angle = dir.arg();
+                                *rotation += (angle - *rotation)
+                                    .clamp_abs(Coord::new(10.0) * self.delta_time);
+                                // TODO: remove magic constant
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }

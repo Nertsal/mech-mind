@@ -69,7 +69,7 @@ impl Render {
                             },
                             unit.position + *hand_pos + weapon_pos.rotate(*rotation),
                             unit.flip_sprite,
-                            rotation.as_f32() + f32::PI / 2.0,
+                            rotation.as_f32(),
                             geng,
                             framebuffer,
                             camera,

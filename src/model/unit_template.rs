@@ -101,9 +101,9 @@ fn tank(assets: &Rc<Assets>) -> UnitTemplate {
         },
         idle_animation,
         extra_render: Some(ExtraUnitRender::Tank {
-            hand_pos: vec2(-0.4, 0.6).map(Coord::new),
-            weapon_pos: vec2(0.6, 0.5).map(Coord::new),
-            rotation: Coord::new(-f32::PI / 2.0),
+            hand_pos: vec2(-0.4, 0.5).map(Coord::new),
+            weapon_pos: vec2(1.2, 0.1).map(Coord::new),
+            rotation: Coord::ZERO,
         }),
     }
 }

@@ -82,7 +82,11 @@ impl ProjectileEffect {
 }
 
 /// Returns possible (0, 1, or 2) velocities that will land in the desired location
-fn aim_parabollically(delta_pos: Position, gravity: Coord, speed: Coord) -> Vec<(Velocity, Time)> {
+pub fn aim_parabollically(
+    delta_pos: Position,
+    gravity: Coord,
+    speed: Coord,
+) -> Option<(Velocity, Time)> {
     let &[x, y] = delta_pos.deref();
     let s = speed;
     let g = gravity;
@@ -109,7 +113,7 @@ fn aim_parabollically(delta_pos: Position, gravity: Coord, speed: Coord) -> Vec<
     let root = s * s * s * s + Coord::new(2.0) * g * y * s * s - g * g * x * x;
     if root < Coord::ZERO {
         // Hitting the target with the specified speed is impossible
-        return vec![];
+        return None;
     }
     let root = root.sqrt();
     let mult = x * x / Coord::new(2.0) / (x * x + y * y);
@@ -125,7 +129,7 @@ fn aim_parabollically(delta_pos: Position, gravity: Coord, speed: Coord) -> Vec<
             let vy = (Coord::new(2.0) * y - g * t * t) / (Coord::new(2.0) * t);
             (vec2(vx, vy), t)
         })
-        .collect()
+        .min_by_key(|(_, t)| *t)
 }
 
 impl DamageEffect {
