@@ -6,23 +6,21 @@ impl Logic<'_> {
     }
 
     fn process_unit_animation(&mut self, unit: &mut Unit) {
-        unit.animation_state.frame_time += self.delta_time;
-        let frame = unit
-            .animation_state
-            .animation
-            .keyframes
-            .get(unit.animation_state.frame)
-            .expect("Failed to find animation frame");
-        let delta = unit.animation_state.frame_time - frame.time;
-        if delta >= Time::ZERO {
-            // Next frame
-            unit.animation_state.frame_time = delta;
-            if unit.animation_state.animation.keyframes.len() <= unit.animation_state.frame + 1 {
-                // Repeat
-                unit.animation_state.frame = 0;
-            } else {
-                unit.animation_state.frame += 1;
+        if let Some(effect) = unit.animation_state.update(self.delta_time) {
+            let mut context = EffectContext {
+                caster: Some(unit.id),
+                target: None,
+            };
+            if let ActionState::InProgress { target } = unit.action_state {
+                context.target = target;
+                if unit.animation_state.frame == 0 {
+                    // Stop action
+                    unit.action_state = ActionState::Cooldown {
+                        time_left: unit.action.cooldown,
+                    };
+                }
             }
+            self.effects.push_front(QueuedEffect { effect, context });
         }
     }
 }

@@ -32,16 +32,20 @@ impl Effect {
     pub fn process(self, context: EffectContext, logic: &mut Logic) {
         match self {
             Effect::Noop => {}
-            Effect::Projectile(effect) => effect.process(context, logic),
-            Effect::Damage(effect) => effect.process(context, logic),
+            Effect::Projectile(effect) => {
+                effect.process(context, logic);
+            }
+            Effect::Damage(effect) => {
+                effect.process(context, logic);
+            }
         }
     }
 }
 
 impl ProjectileEffect {
-    pub fn process(self, context: EffectContext, logic: &mut Logic) {
+    pub fn process(self, context: EffectContext, logic: &mut Logic) -> Option<()> {
         let caster = context.get_expect(Who::Caster, logic);
-        let target = context.get_expect(Who::Target, logic);
+        let target = context.get(Who::Target, logic)?;
         let position = self.offset + caster.position;
 
         // Use simple prediction for better aim
@@ -73,6 +77,7 @@ impl ProjectileEffect {
                 velocity,
             });
         }
+        Some(())
     }
 }
 
