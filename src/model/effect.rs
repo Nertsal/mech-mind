@@ -175,5 +175,19 @@ impl HealEffect {
     pub fn process(self, context: EffectContext, logic: &mut Logic) {
         let target = context.get_mut_expect(Who::Target, logic);
         target.health.change(self.value);
+        let target_position = target.position;
+        let animation = unit_template::to_animation(
+            &logic.model.assets.effects.heal,
+            vec2(2.0, 2.0),
+            Time::ONE,
+            None,
+        );
+        logic.model.particles.insert(Particle {
+            id: logic.model.id_gen.gen(),
+            alive: true,
+            follow_unit: context.target,
+            position: target_position,
+            animation_state: AnimationState::new(&animation).0,
+        });
     }
 }

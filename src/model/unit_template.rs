@@ -36,7 +36,7 @@ impl UnitTemplate {
     }
 }
 
-fn to_animation(
+pub fn to_animation(
     textures: &[assets::PixelTexture],
     sprite_size: Vec2<f32>,
     cycle_time: Time,

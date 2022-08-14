@@ -7,7 +7,7 @@ mod effect;
 mod health;
 mod id;
 mod sprite;
-mod unit_template;
+pub mod unit_template;
 
 pub use animation::*;
 pub use collider::*;
@@ -26,12 +26,23 @@ const GRAVITY: Vec2<f32> = vec2(0.0, -9.8);
 const FOV: f32 = 20.0;
 
 pub struct Model {
+    pub assets: Rc<Assets>,
     pub id_gen: IdGen,
     pub gravity: Velocity,
     pub camera: Camera2d,
     pub units: Collection<Unit>,
     pub templates: UnitTemplates,
     pub projectiles: Collection<Projectile>,
+    pub particles: Collection<Particle>,
+}
+
+#[derive(HasId, Debug, Clone)]
+pub struct Particle {
+    pub id: Id,
+    pub alive: bool,
+    pub follow_unit: Option<Id>,
+    pub position: Position,
+    pub animation_state: AnimationState,
 }
 
 pub struct UnitTemplates {
@@ -147,6 +158,7 @@ pub struct Projectile {
 impl Model {
     pub fn new(assets: &Rc<Assets>) -> Self {
         Self {
+            assets: assets.clone(),
             id_gen: IdGen::new(),
             gravity: GRAVITY.map(Coord::new),
             camera: Camera2d {
@@ -156,6 +168,7 @@ impl Model {
             },
             units: default(),
             projectiles: default(),
+            particles: default(),
             templates: UnitTemplates::new(assets),
         }
     }

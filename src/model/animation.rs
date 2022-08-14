@@ -13,7 +13,7 @@ pub struct AnimationFrame {
     pub start_effect: Option<Effect>,
 }
 
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct AnimationState {
     pub animation: Rc<Animation>,
     pub frame: usize,

@@ -92,6 +92,19 @@ impl Render {
                 camera,
             );
         }
+
+        // Draw particles
+        for particle in &model.particles {
+            draw_sprite(
+                particle.animation_state.get_sprite(),
+                particle.position,
+                false,
+                0.0,
+                geng,
+                framebuffer,
+                camera,
+            );
+        }
     }
 }
 
