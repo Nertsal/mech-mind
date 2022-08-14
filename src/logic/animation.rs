@@ -20,7 +20,7 @@ impl Logic<'_> {
             self.effects.push_front(QueuedEffect { effect, context });
         }
 
-        if looped && unit.animation_state.frame == 0 {
+        if looped {
             if let ActionState::InProgress { .. } = unit.action_state {
                 // Stop action
                 unit.action_state = ActionState::Cooldown {
