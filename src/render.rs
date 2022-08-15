@@ -10,6 +10,62 @@ pub struct Render {
     geng: Geng,
     assets: Rc<Assets>,
     camera: Camera2d,
+    background: Background,
+    last_cam_pos: Coord,
+}
+
+pub struct Background {
+    objects: Vec<Sprite>,
+    placed: Vec<(Position, Coord, Sprite)>,
+}
+
+impl Background {
+    pub fn new(assets: &Rc<Assets>) -> Self {
+        Self {
+            placed: vec![],
+            objects: vec![
+                Sprite::new(&assets.background.pillar1, 0.03),
+                Sprite::new(&assets.background.pillar2, 0.03),
+                Sprite::new(&assets.background.tower, 0.03),
+                Sprite::new(&assets.background.town, 0.03),
+            ],
+        }
+    }
+
+    pub fn update(&mut self, max: Coord, delta_pos: Coord) {
+        // Move objects back
+        for (pos, speed, _) in &mut self.placed {
+            pos.x -= *speed * delta_pos;
+        }
+
+        // Remove objects that are out of view
+        self.placed
+            .retain(|(pos, _, sprite)| pos.x + Coord::new(sprite.size.x / 2.0) >= Coord::ZERO);
+
+        // Place new objects
+        let mut placed_max = self
+            .placed
+            .iter()
+            .map(|(pos, _, sprite)| pos.x + Coord::new(sprite.size.x / 2.0))
+            .max()
+            .unwrap_or(Coord::ZERO);
+        let mut rng = global_rng();
+        while placed_max < max {
+            match self.objects.choose(&mut rng) {
+                None => break,
+                Some(object) => {
+                    let offset = rng.gen_range(Coord::new(0.5)..=Coord::new(2.0));
+                    placed_max += offset + Coord::new(object.size.x);
+                    let position = vec2(
+                        placed_max - Coord::new(object.size.x / 2.0),
+                        Coord::new(object.size.y / 2.0),
+                    );
+                    let speed = Coord::new(1.0);
+                    self.placed.push((position, speed, object.clone()));
+                }
+            }
+        }
+    }
 }
 
 impl Render {
@@ -22,6 +78,8 @@ impl Render {
                 rotation: 0.0,
                 fov: FOV,
             },
+            background: Background::new(assets),
+            last_cam_pos: Coord::ZERO,
         }
     }
 
@@ -30,8 +88,27 @@ impl Render {
         let camera_width = self.camera.fov * framebuffer_size.x / framebuffer_size.y;
         self.camera.center.x = model.left_border.as_f32() + camera_width / 2.0;
 
+        self.background.update(
+            Coord::new(camera_width),
+            Coord::new(self.camera.center.x) - self.last_cam_pos,
+        );
+        for (pos, _, sprite) in &self.background.placed {
+            let pos = *pos + vec2(model.left_border, model.ground_level);
+            draw_sprite(
+                sprite,
+                pos,
+                false,
+                0.0,
+                &self.geng,
+                framebuffer,
+                &self.camera,
+            );
+        }
+
         self.draw_world(model, framebuffer);
         self.draw_ui(model, framebuffer);
+
+        self.last_cam_pos = Coord::new(self.camera.center.x);
     }
 
     fn draw_world(&mut self, model: &Model, framebuffer: &mut ugli::Framebuffer) {
