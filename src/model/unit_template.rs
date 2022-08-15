@@ -78,23 +78,30 @@ fn tank(assets: &Rc<Assets>) -> UnitTemplate {
         Time::ONE,
         vec![(
             2,
-            Effect::Projectile(Box::new(ProjectileEffect {
-                offset: Position::ZERO,
-                ai: ProjectileAI::Idle,
-                collider: Collider::Aabb {
-                    size: vec2(0.5, 0.5).map(Coord::new),
-                },
-                speed: Coord::new(10.0),
-                on_hit: Effect::Damage(Box::new(DamageEffect {
-                    damage_type: DamageType::Physical,
-                    value: Hp::new(1.0),
-                })),
-                animation: to_animation(
-                    &[assets.mech.tank.projectile.clone()],
-                    1.0 / 16.0,
-                    Time::ONE,
-                    vec![],
-                ),
+            Effect::List(Box::new(ListEffect {
+                effects: vec![
+                    Effect::Projectile(Box::new(ProjectileEffect {
+                        offset: Position::ZERO,
+                        ai: ProjectileAI::Idle,
+                        collider: Collider::Aabb {
+                            size: vec2(0.5, 0.5).map(Coord::new),
+                        },
+                        speed: Coord::new(10.0),
+                        on_hit: Effect::Damage(Box::new(DamageEffect {
+                            damage_type: DamageType::Physical,
+                            value: Hp::new(1.0),
+                        })),
+                        animation: to_animation(
+                            &[assets.mech.tank.projectile.clone()],
+                            1.0 / 16.0,
+                            Time::ONE,
+                            vec![],
+                        ),
+                    })),
+                    Effect::Sound(Box::new(SoundEffect {
+                        sound: assets.sound_design.mechs.tank.shoot.clone(),
+                    })),
+                ],
             })),
         )],
     );
@@ -230,8 +237,15 @@ fn healer(assets: &Rc<Assets>) -> UnitTemplate {
         Time::ONE,
         vec![(
             5,
-            Effect::Heal(Box::new(HealEffect {
-                value: Hp::new(5.0),
+            Effect::List(Box::new(ListEffect {
+                effects: vec![
+                    Effect::Heal(Box::new(HealEffect {
+                        value: Hp::new(5.0),
+                    })),
+                    Effect::Sound(Box::new(SoundEffect {
+                        sound: assets.sound_design.mechs.healer.heal_effect.clone(),
+                    })),
+                ],
             })),
         )],
     );
