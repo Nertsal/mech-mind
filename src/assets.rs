@@ -18,6 +18,12 @@ pub struct UIAssets {
     pub enemy_health: PixelTexture,
     pub energy_bar: PixelTexture,
     pub mech_bar: PixelTexture,
+    pub artillery_slot: PixelTexture,
+    pub artillery_slot_bg: PixelTexture,
+    pub healer_slot: PixelTexture,
+    pub healer_slot_bg: PixelTexture,
+    pub tank_slot: PixelTexture,
+    pub tank_slot_bg: PixelTexture,
 }
 
 #[derive(geng::Assets)]
