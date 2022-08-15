@@ -17,9 +17,10 @@ impl Model {
                     return;
                 }
                 self.player_energy.change(-cost);
+                let mut rng = global_rng();
                 let position = vec2(
-                    self.left_border + Coord::new(5.0),
-                    self.ground_level + Coord::new(5.0),
+                    self.left_border + Coord::new(rng.gen_range(2.0..=10.0)),
+                    self.ground_level + Coord::new(rng.gen_range(2.0..=10.0)),
                 );
                 self.spawn_unit(template, position, Faction::Mech);
             }
