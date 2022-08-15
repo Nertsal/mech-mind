@@ -80,6 +80,9 @@ fn tank(assets: &Rc<Assets>) -> UnitTemplate {
             Effect::Projectile(Box::new(ProjectileEffect {
                 offset: Position::ZERO,
                 ai: ProjectileAI::Idle,
+                collider: Collider::Aabb {
+                    size: vec2(0.5, 0.5).map(Coord::new),
+                },
                 speed: Coord::new(10.0),
                 on_hit: Effect::Damage(Box::new(DamageEffect {
                     damage_type: DamageType::Physical,
@@ -143,6 +146,9 @@ fn artillery(assets: &Rc<Assets>) -> UnitTemplate {
                     speed: Coord::new(15.0),
                     acceleration: Coord::new(20.0),
                     preferred_height: Coord::new(7.0),
+                },
+                collider: Collider::Aabb {
+                    size: vec2(0.5, 0.5).map(Coord::new),
                 },
                 speed: Coord::ZERO,
                 on_hit: Effect::Damage(Box::new(DamageEffect {
@@ -242,6 +248,9 @@ fn blighter(assets: &Rc<Assets>) -> UnitTemplate {
             Effect::Projectile(Box::new(ProjectileEffect {
                 offset: vec2(0.0, 0.5).map(Coord::new),
                 ai: ProjectileAI::Idle,
+                collider: Collider::Aabb {
+                    size: vec2(0.5, 0.5).map(Coord::new),
+                },
                 speed: Coord::new(10.0),
                 on_hit: Effect::Damage(Box::new(DamageEffect {
                     damage_type: DamageType::Physical,

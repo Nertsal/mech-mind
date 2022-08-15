@@ -15,6 +15,7 @@ pub enum Effect {
 pub struct ProjectileEffect {
     pub offset: Position,
     pub ai: ProjectileAI,
+    pub collider: Collider,
     pub speed: Coord,
     pub on_hit: Effect,
     pub animation: Rc<Animation>,
@@ -118,9 +119,7 @@ impl ProjectileEffect {
             animation_state: AnimationState::new(&self.animation).0,
             ai: self.ai,
             lifetime: Time::new(10.0),
-            collider: Collider::Aabb {
-                size: vec2(1.0, 1.0).map(Coord::new),
-            },
+            collider: self.collider,
             on_hit: self.on_hit,
             caster: context.caster,
             target: context.target,
