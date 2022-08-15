@@ -101,6 +101,7 @@ fn tank(assets: &Rc<Assets>) -> UnitTemplate {
     UnitTemplate {
         ai: UnitAI::Engage {
             target: TargetAI::Closest,
+            default: PositionAI::Advance,
             switch: None,
         },
         health: Health::new(Hp::new(10.0)),
@@ -171,6 +172,7 @@ fn artillery(assets: &Rc<Assets>) -> UnitTemplate {
     UnitTemplate {
         ai: UnitAI::Engage {
             target: TargetAI::Closest,
+            default: PositionAI::Advance,
             switch: None,
         },
         health: Health::new(Hp::new(10.0)),
@@ -217,6 +219,7 @@ fn healer(assets: &Rc<Assets>) -> UnitTemplate {
     UnitTemplate {
         ai: UnitAI::Engage {
             target: TargetAI::LowestHp,
+            default: PositionAI::Follow,
             switch: None,
         },
         health: Health::new(Hp::new(10.0)),
@@ -278,6 +281,7 @@ fn blighter(assets: &Rc<Assets>) -> UnitTemplate {
     UnitTemplate {
         ai: UnitAI::Engage {
             target: TargetAI::Farthest,
+            default: PositionAI::Advance,
             switch: None,
         },
         health: Health::new(Hp::new(10.0)),
@@ -342,6 +346,7 @@ fn ravager(assets: &Rc<Assets>) -> UnitTemplate {
     UnitTemplate {
         ai: UnitAI::Engage {
             target: TargetAI::Closest,
+            default: PositionAI::Advance,
             switch: Some(SwitchAction {
                 next_action: Action {
                     cooldown: Time::ZERO,
@@ -350,6 +355,7 @@ fn ravager(assets: &Rc<Assets>) -> UnitTemplate {
                 },
                 next_ai: Box::new(UnitAI::Engage {
                     target: TargetAI::Closest,
+                    default: PositionAI::Advance,
                     switch: Some(SwitchAction {
                         next_action: Action {
                             cooldown: Time::new(2.0),
@@ -358,6 +364,7 @@ fn ravager(assets: &Rc<Assets>) -> UnitTemplate {
                         },
                         next_ai: Box::new(UnitAI::Engage {
                             target: TargetAI::Closest,
+                            default: PositionAI::Advance,
                             switch: Some(SwitchAction {
                                 next_action: Action {
                                     cooldown: Time::new(1.0),
@@ -366,6 +373,7 @@ fn ravager(assets: &Rc<Assets>) -> UnitTemplate {
                                 },
                                 next_ai: Box::new(UnitAI::Engage {
                                     target: TargetAI::Closest,
+                                    default: PositionAI::Advance,
                                     switch: None,
                                 }),
                             }),

@@ -102,8 +102,15 @@ pub enum UnitAI {
     },
     Engage {
         target: TargetAI,
+        default: PositionAI,
         switch: Option<SwitchAction>,
     },
+}
+
+#[derive(Debug, Clone)]
+pub enum PositionAI {
+    Advance,
+    Follow,
 }
 
 #[derive(Debug, Clone)]

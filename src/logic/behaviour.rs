@@ -1,3 +1,5 @@
+use geng::prelude::itertools::Itertools;
+
 use super::*;
 
 impl Logic<'_> {
@@ -8,7 +10,9 @@ impl Logic<'_> {
     fn process_unit_behaviour(&mut self, unit: &mut Unit) {
         match &unit.ai {
             UnitAI::Idle => {}
-            UnitAI::Engage { target, .. } => {
+            UnitAI::Engage {
+                target, default, ..
+            } => {
                 let target = find_target(unit, &self.model.units, target);
                 if let Some(target) = target {
                     let distance = (target.position - unit.position).len();
@@ -48,21 +52,60 @@ impl Logic<'_> {
                         }
                     }
                 } else {
-                    unit.target_velocity = vec2(unit.speed, unit.velocity.y);
-                    if !Rc::ptr_eq(&unit.animation_state.animation, &unit.move_animation) {
-                        let (state, effect) = AnimationState::new(&unit.move_animation);
-                        unit.animation_state = state;
-                        if let Some(effect) = effect {
-                            self.effects.push_front(QueuedEffect {
-                                effect,
-                                context: EffectContext {
-                                    caster: Some(unit.id),
-                                    target: None,
-                                },
-                            })
+                    // Default
+                    let target_dir = match default {
+                        PositionAI::Advance => {
+                            let friend = self
+                                .model
+                                .units
+                                .iter()
+                                .filter(|other| other.faction == unit.faction)
+                                .map(|other| other.position.x)
+                                .min();
+                            match friend.filter(|min| unit.position.x - *min < Coord::new(7.0)) {
+                                Some(_) => Coord::ONE,
+                                None => Coord::ZERO,
+                            }
                         }
+                        PositionAI::Follow => {
+                            let friends = match self
+                                .model
+                                .units
+                                .iter()
+                                .filter(|other| other.faction == unit.faction)
+                                .map(|other| other.position.x)
+                                .minmax()
+                            {
+                                itertools::MinMaxResult::NoElements => None,
+                                itertools::MinMaxResult::OneElement(x) => Some((x, x)),
+                                itertools::MinMaxResult::MinMax(min, max) => Some((min, max)),
+                            };
+                            if let Some((min, max)) = friends {
+                                let target = (min + max) / Coord::new(2.0);
+                                target - unit.position.x
+                            } else {
+                                Coord::ONE
+                            }
+                        }
+                    };
+                    if target_dir != Coord::ZERO {
+                        unit.target_velocity =
+                            vec2(unit.speed * target_dir.signum(), unit.velocity.y);
+                        if !Rc::ptr_eq(&unit.animation_state.animation, &unit.move_animation) {
+                            let (state, effect) = AnimationState::new(&unit.move_animation);
+                            unit.animation_state = state;
+                            if let Some(effect) = effect {
+                                self.effects.push_front(QueuedEffect {
+                                    effect,
+                                    context: EffectContext {
+                                        caster: Some(unit.id),
+                                        target: None,
+                                    },
+                                })
+                            }
+                        }
+                        return;
                     }
-                    return;
                 }
             }
             UnitAI::Stinger {
@@ -282,7 +325,7 @@ fn find_target<'a>(
             .max_by_key(|other| (caster.position - other.position).len_sqr()),
         TargetAI::LowestHp => units
             .into_iter()
-            .filter(|other| other.faction == caster.faction)
+            .filter(|other| other.faction == caster.faction && other.health.ratio() < Hp::ONE)
             .min_by_key(|other| other.health.hp),
     }
 }
