@@ -8,10 +8,10 @@ impl Model {
             PlayerEvent::SpawnMech(mech) => {
                 let (template, cost) = match mech {
                     game::MechType::Artillery => {
-                        (self.templates.artillery.clone(), Currency::new(10.0))
+                        (self.templates.artillery.clone(), Currency::new(40.0))
                     }
-                    game::MechType::Tank => (self.templates.tank.clone(), Currency::new(10.0)),
-                    game::MechType::Healer => (self.templates.healer.clone(), Currency::new(10.0)),
+                    game::MechType::Tank => (self.templates.tank.clone(), Currency::new(30.0)),
+                    game::MechType::Healer => (self.templates.healer.clone(), Currency::new(25.0)),
                 };
                 if self.player_energy.hp < cost {
                     return;

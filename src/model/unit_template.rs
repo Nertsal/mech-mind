@@ -111,7 +111,7 @@ fn tank(assets: &Rc<Assets>) -> UnitTemplate {
             default: PositionAI::Advance,
             switch: None,
         },
-        health: Health::new(Hp::new(10.0)),
+        health: Health::new(Hp::new(30.0)),
         sanity: Some(Health::new(Hp::new(100.0))),
         collider: Collider::Aabb {
             size: vec2(1.0, 2.0).map(Coord::new),
@@ -255,12 +255,12 @@ fn healer(assets: &Rc<Assets>) -> UnitTemplate {
             default: PositionAI::Follow,
             switch: None,
         },
-        health: Health::new(Hp::new(10.0)),
+        health: Health::new(Hp::new(7.0)),
         sanity: None,
         collider: Collider::Aabb {
             size: vec2(1.0, 2.0).map(Coord::new),
         },
-        speed: Coord::new(2.0),
+        speed: Coord::new(2.5),
         acceleration: Coord::new(10.0),
         start_action_state: ActionState::Cooldown {
             time_left: Time::new(3.0),
@@ -299,7 +299,7 @@ fn blighter(assets: &Rc<Assets>) -> UnitTemplate {
                         collider: Collider::Aabb {
                             size: vec2(0.5, 0.5).map(Coord::new),
                         },
-                        speed: Coord::new(10.0),
+                        speed: Coord::new(20.0),
                         on_hit: Effect::Damage(Box::new(DamageEffect {
                             damage_type: DamageType::Physical,
                             value: Hp::new(2.0),
@@ -336,7 +336,7 @@ fn blighter(assets: &Rc<Assets>) -> UnitTemplate {
         },
         action: Action {
             cooldown: Time::new(1.0),
-            engage_radius: Coord::new(7.0),
+            engage_radius: Coord::new(21.0),
             animation,
         },
         idle_animation,
@@ -452,7 +452,7 @@ fn ravager(assets: &Rc<Assets>) -> UnitTemplate {
                 }),
             }),
         },
-        health: Health::new(Hp::new(10.0)),
+        health: Health::new(Hp::new(20.0)),
         sanity: None,
         collider: Collider::Aabb {
             size: vec2(2.0, 1.0).map(Coord::new),
@@ -501,12 +501,12 @@ fn stinger(assets: &Rc<Assets>) -> UnitTemplate {
             preferred_right: false,
             charge_speed: Coord::new(30.0),
         },
-        health: Health::new(Hp::new(10.0)),
+        health: Health::new(Hp::new(5.0)),
         sanity: None,
         collider: Collider::Aabb {
             size: vec2(1.0, 2.0).map(Coord::new),
         },
-        speed: Coord::new(20.0),
+        speed: Coord::new(15.0),
         acceleration: Coord::new(10.0),
         start_action_state: ActionState::Cooldown {
             time_left: Time::new(5.0),

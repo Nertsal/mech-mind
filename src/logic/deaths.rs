@@ -6,7 +6,7 @@ impl Logic<'_> {
         self.model.units.retain(|unit| {
             let alive = unit.health.is_alive();
             if !alive {
-                self.model.player_energy.change(Hp::new(10.0));
+                self.model.player_energy.change(Hp::new(15.0));
             }
             alive
         });
