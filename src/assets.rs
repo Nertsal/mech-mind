@@ -10,6 +10,14 @@ pub struct Assets {
     pub effects: EffectAssets,
     pub enemies: EnemyAssets,
     pub mech: MechAssets,
+    pub ui: UIAssets,
+}
+
+#[derive(geng::Assets)]
+pub struct UIAssets {
+    pub enemy_health: PixelTexture,
+    pub energy_bar: PixelTexture,
+    pub mech_bar: PixelTexture,
 }
 
 #[derive(geng::Assets)]
