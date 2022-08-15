@@ -19,8 +19,11 @@ impl Logic<'_> {
         unit.position += unit.velocity * self.delta_time;
 
         // Check ground
-        if unit.position.y <= self.model.ground_level {
-            unit.position.y = self.model.ground_level;
+        let down = match &unit.collider {
+            Collider::Aabb { size } => size.y / Coord::new(2.0),
+        };
+        if unit.position.y - down <= self.model.ground_level {
+            unit.position.y = self.model.ground_level + down;
             unit.velocity.y = Coord::ZERO;
         }
         // Check left border
