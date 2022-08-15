@@ -131,12 +131,16 @@ impl ProjectileEffect {
     }
 }
 
-/// Returns possible (0, 1, or 2) velocities that will land in the desired location
+/// Returns possible the most direct (if exists) velocity that will land in the desired location
 pub fn aim_parabollically(
     delta_pos: Position,
     gravity: Coord,
     speed: Coord,
 ) -> Option<(Velocity, Time)> {
+    if delta_pos.eq(&Position::ZERO) {
+        // Safety check
+        return Some((Velocity::ZERO, Time::ZERO));
+    }
     let &[x, y] = delta_pos.deref();
     let s = speed;
     let g = gravity;

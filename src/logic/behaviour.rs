@@ -114,18 +114,22 @@ impl Logic<'_> {
                                 if unit.flip_sprite {
                                     offset.x = -offset.x;
                                 }
-                                if let Some((dir, _)) = aim_parabollically(
-                                    target_pos - (unit.position + offset),
-                                    self.model.gravity.y,
-                                    effect.speed,
-                                ) {
-                                    let mut angle = dir.arg();
-                                    if unit.flip_sprite {
-                                        angle = Coord::PI - angle;
+                                let delta = target_pos - (unit.position + offset);
+                                // Avoid awkward aim
+                                if delta.len_sqr() > (*weapon_pos + *shoot_pos).len_sqr() {
+                                    if let Some((dir, _)) = aim_parabollically(
+                                        delta,
+                                        self.model.gravity.y,
+                                        effect.speed,
+                                    ) {
+                                        let mut angle = dir.arg();
+                                        if unit.flip_sprite {
+                                            angle = Coord::PI - angle;
+                                        }
+                                        *rotation += (angle - *rotation)
+                                            .clamp_abs(Coord::new(10.0) * self.delta_time);
+                                        // TODO: remove magic constant
                                     }
-                                    *rotation += (angle - *rotation)
-                                        .clamp_abs(Coord::new(10.0) * self.delta_time);
-                                    // TODO: remove magic constant
                                 }
                             }
                         }
