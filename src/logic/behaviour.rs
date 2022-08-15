@@ -199,13 +199,16 @@ impl Logic<'_> {
                     }) = &mut unit.extra_render
                     {
                         // Aim at the target
-                        if let Some(frame) = unit
+                        if let Some((index, frame)) = unit
                             .animation_state
                             .animation
                             .keyframes
                             .iter()
                             .skip(unit.animation_state.frame + 1)
-                            .find(|frame| matches!(frame.start_effect, Some(Effect::Projectile(_))))
+                            .enumerate()
+                            .find(|(_, frame)| {
+                                matches!(frame.start_effect, Some(Effect::Projectile(_)))
+                            })
                         {
                             if let Some(Effect::Projectile(effect)) = &frame.start_effect {
                                 let mut offset =
@@ -216,19 +219,40 @@ impl Logic<'_> {
                                 let delta = target_pos - (unit.position + offset);
                                 // Avoid awkward aim
                                 if delta.len_sqr() > (*weapon_pos + *shoot_pos).len_sqr() {
-                                    if let Some((dir, _)) = aim_parabollically(
+                                    let dir = aim_parabollically(
                                         delta,
                                         self.model.gravity.y,
                                         effect.speed,
-                                    ) {
-                                        let mut angle = dir.arg();
-                                        if unit.flip_sprite {
-                                            angle = Coord::PI - angle;
-                                        }
-                                        *rotation += (angle - *rotation)
-                                            .clamp_abs(Coord::new(10.0) * self.delta_time);
-                                        // TODO: remove magic constant
+                                    )
+                                    .map(|(dir, _)| dir)
+                                    .unwrap_or(delta);
+                                    let mut angle = dir.arg();
+                                    if unit.flip_sprite {
+                                        angle = Coord::PI - angle;
                                     }
+                                    let time = unit
+                                        .animation_state
+                                        .animation
+                                        .keyframes
+                                        .get(unit.animation_state.frame)
+                                        .unwrap()
+                                        .time
+                                        - unit.animation_state.frame_time
+                                        + unit
+                                            .animation_state
+                                            .animation
+                                            .keyframes
+                                            .iter()
+                                            .take(index)
+                                            .skip(unit.animation_state.frame + 1)
+                                            .map(|frame| frame.time)
+                                            .fold(Time::ZERO, Time::add);
+                                    let delta = angle - *rotation;
+                                    *rotation += if time > Time::ZERO {
+                                        delta.clamp_abs(delta / time * self.delta_time)
+                                    } else {
+                                        delta
+                                    };
                                 }
                             }
                         }
