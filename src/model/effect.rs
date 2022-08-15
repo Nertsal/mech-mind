@@ -244,7 +244,11 @@ impl SpawnCoinEffect {
         let coin = Coin {
             position: caster.position,
             id: logic.model.id_gen.gen(),
+            alive: true,
             radius: Coord::new(0.2),
+            collider: Collider::Aabb {
+                size: vec2(0.2, 0.2).map(Coord::new),
+            },
         };
         logic.model.coins.insert(coin);
     }

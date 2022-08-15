@@ -3,6 +3,7 @@ use model::*;
 use std::collections::VecDeque;
 
 mod action;
+mod coins;
 mod animation;
 mod behaviour;
 mod deaths;
@@ -38,6 +39,7 @@ impl Model {
 
 impl Logic<'_> {
     fn process(&mut self) {
+        self.process_coins();
         self.process_statuses();
         self.process_behaviour();
         self.process_animations();

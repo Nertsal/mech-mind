@@ -21,6 +21,7 @@ pub type Hp = R32;
 pub type Coord = R32;
 pub type Position = Vec2<Coord>;
 pub type Velocity = Vec2<Coord>;
+pub type Currency = i64;
 
 const GRAVITY: Vec2<f32> = vec2(0.0, -9.8);
 const FOV: f32 = 20.0;
@@ -28,6 +29,7 @@ const FOV: f32 = 20.0;
 pub struct Model {
     pub assets: Rc<Assets>,
     pub id_gen: IdGen,
+    pub player_coins: Currency,
     pub gravity: Velocity,
     pub camera: Camera2d,
     pub units: Collection<Unit>,
@@ -40,8 +42,10 @@ pub struct Model {
 #[derive(HasId, Debug, Clone)]
 pub struct Coin {
     pub id: Id,
+    pub alive: bool,
     pub position: Position,
     pub radius: Coord,
+    pub collider: Collider,
 }
 
 #[derive(HasId, Debug, Clone)]
@@ -189,6 +193,7 @@ impl Model {
         Self {
             assets: assets.clone(),
             id_gen: IdGen::new(),
+            player_coins: 0,
             gravity: GRAVITY.map(Coord::new),
             camera: Camera2d {
                 center: Vec2::ZERO,
