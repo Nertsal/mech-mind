@@ -201,6 +201,7 @@ pub struct Projectile {
     pub lifetime: Time,
     pub collider: Collider,
     pub on_hit: Effect,
+    pub friend_faction: Option<Faction>,
     pub caster: Option<Id>,
     pub target: Option<Id>,
     pub position: Position,

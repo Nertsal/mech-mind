@@ -41,7 +41,11 @@ impl Logic<'_> {
         // Check for collisions
         for projectile in &mut self.model.projectiles {
             for unit in &self.model.units {
-                if Some(unit.id) == projectile.caster {
+                if projectile
+                    .friend_faction
+                    .map(|faction| unit.faction == faction)
+                    .unwrap_or(false)
+                {
                     continue;
                 }
                 if projectile

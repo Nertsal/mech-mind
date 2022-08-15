@@ -113,6 +113,7 @@ impl ProjectileEffect {
             .map(|(v, _)| v)
             .unwrap_or((target_pos - position).normalize_or_zero() * self.speed);
         logic.model.projectiles.insert(Projectile {
+            friend_faction: Some(caster.faction),
             id: logic.model.id_gen.gen(),
             animation_state: AnimationState::new(&self.animation).0,
             ai: self.ai,
