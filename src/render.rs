@@ -242,6 +242,19 @@ impl Render {
                             (unit.animation_state.get_sprite().size.y + sprite.size.y) / 2.0,
                         )
                         .map(Coord::new);
+                    let bar_aabb = layout(
+                        AABB {
+                            x_min: 4.0 / 35.0,
+                            x_max: 31.0 / 35.0,
+                            y_min: 1.0 - 19.0 / 27.0,
+                            y_max: 1.0 - 15.0 / 27.0,
+                        },
+                        sprite.size,
+                        position,
+                        unit.health.ratio().as_f32(),
+                    );
+                    let color = Color::try_from("#7dd46c").unwrap();
+                    draw_2d::Quad::new(bar_aabb, color).draw_2d(geng, framebuffer, camera);
                     draw_sprite(&sprite, position, false, 0.0, geng, framebuffer, camera);
                 }
                 Faction::Alien => {
