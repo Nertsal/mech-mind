@@ -41,7 +41,7 @@ impl Logic<'_> {
     }
 
     fn get_difficulty(&self) -> R32 {
-        let distance = self.model.left_border.max(R32::new(10.0));
+        let distance = (self.model.left_border / r32(5.0)).max(R32::new(10.0));
         let team_size = self
             .model
             .units
@@ -60,6 +60,7 @@ impl Logic<'_> {
         let templates = vec![
             (r32(5.0), &self.model.templates.blighter),
             (r32(3.0), &self.model.templates.ravager),
+            (r32(10.0), &self.model.templates.stinger),
         ];
         let mut rng = global_rng();
         while let Some((diff, template)) = templates
