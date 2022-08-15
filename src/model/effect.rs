@@ -201,8 +201,8 @@ impl DamageEffect {
 }
 
 impl HealEffect {
-    pub fn process(self, context: EffectContext, logic: &mut Logic) {
-        let target = context.get_mut_expect(Who::Target, logic);
+    pub fn process(self, context: EffectContext, logic: &mut Logic) -> Option<()> {
+        let target = context.get_mut(Who::Target, logic)?;
         target.health.change(self.value);
         let target_position = target.position;
         let animation = unit_template::to_animation(
@@ -218,6 +218,7 @@ impl HealEffect {
             position: target_position,
             animation_state: AnimationState::new(&animation).0,
         });
+        Some(())
     }
 }
 
