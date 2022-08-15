@@ -8,6 +8,7 @@ pub enum Effect {
     Damage(Box<DamageEffect>),
     Heal(Box<HealEffect>),
     Dash(Box<DashEffect>),
+    SpawnCoin(Box<SpawnCoinEffect>),
 }
 
 #[derive(Debug, Clone)]
@@ -22,7 +23,6 @@ pub struct ProjectileEffect {
 #[derive(Debug, Clone)]
 pub enum DamageType {
     Physical,
-    Energy,
     Explosive,
 }
 
@@ -44,6 +44,9 @@ pub struct DashEffect {
     pub on_contact: Effect,
 }
 
+#[derive(Debug, Clone)]
+pub struct SpawnCoinEffect {}
+
 impl Effect {
     pub fn process(self, context: EffectContext, logic: &mut Logic) {
         match self {
@@ -58,6 +61,9 @@ impl Effect {
                 effect.process(context, logic);
             }
             Effect::Dash(effect) => {
+                effect.process(context, logic);
+            }
+            Effect::SpawnCoin(effect) => {
                 effect.process(context, logic);
             }
         }
@@ -178,7 +184,19 @@ pub fn aim_parabollically(
 impl DamageEffect {
     pub fn process(self, context: EffectContext, logic: &mut Logic) {
         let target = context.get_mut_expect(Who::Target, logic);
+        let alive = target.health.is_alive();
         target.health.change(-self.value); // TODO: account for different damage types
+        let killed = alive && !target.health.is_alive();
+        if killed {
+            let effect = QueuedEffect {
+                effect: target.on_death.clone(),
+                context: EffectContext {
+                    caster: Some(target.id),
+                    target: None,
+                },
+            };
+            logic.effects.push_front(effect);
+        }
     }
 }
 
@@ -217,5 +235,17 @@ impl DashEffect {
             time: self.duration,
             on_contact: self.on_contact,
         })
+    }
+}
+
+impl SpawnCoinEffect {
+    pub fn process(self, context: EffectContext, logic: &mut Logic) {
+        let caster = context.get_expect(Who::Caster, logic);
+        let coin = Coin {
+            position: caster.position,
+            id: logic.model.id_gen.gen(),
+            radius: Coord::new(0.2),
+        };
+        logic.model.coins.insert(coin);
     }
 }

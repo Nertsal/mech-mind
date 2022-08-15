@@ -34,6 +34,7 @@ impl UnitTemplate {
             idle_animation: self.idle_animation,
             move_animation: self.move_animation,
             extra_render: self.extra_render,
+            on_death: self.on_death,
         }
     }
 }
@@ -121,6 +122,7 @@ fn tank(assets: &Rc<Assets>) -> UnitTemplate {
             shoot_pos: vec2(0.5, 0.0).map(Coord::new),
             rotation: Coord::ZERO,
         }),
+        on_death: Effect::Noop,
     }
 }
 
@@ -179,6 +181,7 @@ fn artillery(assets: &Rc<Assets>) -> UnitTemplate {
         idle_animation,
         move_animation,
         extra_render: None,
+        on_death: Effect::Noop,
     }
 }
 
@@ -221,6 +224,7 @@ fn healer(assets: &Rc<Assets>) -> UnitTemplate {
         idle_animation,
         move_animation,
         extra_render: None,
+        on_death: Effect::Noop,
     }
 }
 
@@ -280,6 +284,7 @@ fn blighter(assets: &Rc<Assets>) -> UnitTemplate {
         idle_animation,
         move_animation,
         extra_render: None,
+        on_death: Effect::SpawnCoin(Box::new(SpawnCoinEffect {})),
     }
 }
 
@@ -380,5 +385,6 @@ fn ravager(assets: &Rc<Assets>) -> UnitTemplate {
         idle_animation,
         move_animation,
         extra_render: None,
+        on_death: Effect::SpawnCoin(Box::new(SpawnCoinEffect {})),
     }
 }

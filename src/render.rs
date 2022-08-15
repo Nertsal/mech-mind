@@ -105,6 +105,16 @@ impl Render {
                 camera,
             );
         }
+
+        // Draw coins
+        for coin in &model.coins {
+            draw_2d::Ellipse::circle(
+                coin.position.map(|x| x.as_f32()),
+                coin.radius.as_f32(),
+                Color::YELLOW,
+            )
+            .draw_2d(geng, framebuffer, camera);
+        }
     }
 }
 

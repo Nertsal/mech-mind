@@ -34,6 +34,14 @@ pub struct Model {
     pub templates: UnitTemplates,
     pub projectiles: Collection<Projectile>,
     pub particles: Collection<Particle>,
+    pub coins: Collection<Coin>,
+}
+
+#[derive(HasId, Debug, Clone)]
+pub struct Coin {
+    pub id: Id,
+    pub position: Position,
+    pub radius: Coord,
 }
 
 #[derive(HasId, Debug, Clone)]
@@ -144,6 +152,7 @@ pub struct Unit {
     pub idle_animation: Rc<Animation>,
     pub move_animation: Rc<Animation>,
     pub extra_render: Option<ExtraUnitRender>,
+    pub on_death: Effect,
 }
 
 #[derive(Clone)]
@@ -158,6 +167,7 @@ pub struct UnitTemplate {
     pub idle_animation: Rc<Animation>,
     pub move_animation: Rc<Animation>,
     pub extra_render: Option<ExtraUnitRender>,
+    pub on_death: Effect,
 }
 
 #[derive(HasId)]
@@ -186,9 +196,10 @@ impl Model {
                 fov: FOV,
             },
             units: default(),
+            templates: UnitTemplates::new(assets),
             projectiles: default(),
             particles: default(),
-            templates: UnitTemplates::new(assets),
+            coins: default(),
         }
     }
 }
