@@ -1,3 +1,5 @@
+use std::collections::VecDeque;
+
 use super::*;
 
 mod animation;
@@ -7,6 +9,7 @@ mod health;
 mod id;
 mod sprite;
 pub mod unit_template;
+mod wave;
 
 pub use animation::*;
 pub use collider::*;
@@ -14,6 +17,7 @@ pub use effect::*;
 pub use health::*;
 pub use id::*;
 pub use sprite::*;
+pub use wave::*;
 
 pub type Time = R32;
 pub type Hp = R32;
@@ -31,6 +35,7 @@ pub struct Model {
     pub left_border: Coord,
     pub ground_level: Coord,
     pub gravity: Velocity,
+    pub waves: VecDeque<Wave>,
     pub units: Collection<Unit>,
     pub templates: UnitTemplates,
     pub projectiles: Collection<Projectile>,
@@ -47,6 +52,7 @@ impl Model {
             left_border: Coord::new(-20.0),
             ground_level: Coord::new(0.0),
             gravity: GRAVITY.map(Coord::new),
+            waves: Wave::start_waves(),
             units: default(),
             templates: UnitTemplates::new(assets),
             projectiles: default(),
@@ -76,10 +82,7 @@ pub struct Particle {
 
 #[derive(Debug, Clone)]
 pub enum Status {
-    Charge {
-        time: Time,
-        on_contact: Effect,
-    }
+    Charge { time: Time, on_contact: Effect },
 }
 
 pub struct UnitTemplates {
@@ -141,7 +144,7 @@ pub enum ActionState {
     Cooldown { time_left: Time },
 }
 
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub enum ExtraUnitRender {
     Tank {
         hand_pos: Position,
@@ -176,7 +179,7 @@ pub struct Unit {
     pub on_death: Effect,
 }
 
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct UnitTemplate {
     pub ai: UnitAI,
     pub health: Health,
