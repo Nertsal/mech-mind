@@ -186,8 +186,8 @@ pub fn aim_parabollically(
 }
 
 impl DamageEffect {
-    pub fn process(self, context: EffectContext, logic: &mut Logic) {
-        let target = context.get_mut_expect(Who::Target, logic);
+    pub fn process(self, context: EffectContext, logic: &mut Logic) -> Option<()> {
+        let target = context.get_mut(Who::Target, logic)?;
         let alive = target.health.is_alive();
         target.health.change(-self.value); // TODO: account for different damage types
         let killed = alive && !target.health.is_alive();
@@ -201,6 +201,7 @@ impl DamageEffect {
             };
             logic.effects.push_front(effect);
         }
+        Some(())
     }
 }
 

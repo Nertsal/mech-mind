@@ -91,6 +91,7 @@ pub struct UnitTemplates {
     pub healer: UnitTemplate,
     pub blighter: UnitTemplate,
     pub ravager: UnitTemplate,
+    pub stinger: UnitTemplate,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -102,6 +103,12 @@ pub enum Faction {
 #[derive(Debug, Clone)]
 pub enum UnitAI {
     Idle,
+    Stinger {
+        target: TargetAI,
+        preferred_height: Coord,
+        preferred_right: bool,
+        charge_speed: Coord,
+    },
     Engage {
         target: TargetAI,
         switch: Option<SwitchAction>,
@@ -187,6 +194,7 @@ pub struct UnitTemplate {
     pub collider: Collider,
     pub speed: Coord,
     pub acceleration: Coord,
+    pub start_action_state: ActionState,
     pub action: Action,
     pub idle_animation: Rc<Animation>,
     pub move_animation: Rc<Animation>,

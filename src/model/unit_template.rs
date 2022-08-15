@@ -8,6 +8,7 @@ impl UnitTemplates {
             healer: healer(assets),
             blighter: blighter(assets),
             ravager: ravager(assets),
+            stinger: stinger(assets),
         }
     }
 }
@@ -28,7 +29,7 @@ impl UnitTemplate {
             target_velocity: Velocity::ZERO,
             statuses: default(),
             action: self.action,
-            action_state: ActionState::Ready,
+            action_state: self.start_action_state,
             flip_sprite: false,
             animation_state: AnimationState::new(&self.idle_animation).0,
             idle_animation: self.idle_animation,
@@ -109,6 +110,9 @@ fn tank(assets: &Rc<Assets>) -> UnitTemplate {
         },
         speed: Coord::new(2.0),
         acceleration: Coord::new(10.0),
+        start_action_state: ActionState::Cooldown {
+            time_left: Time::new(3.0),
+        },
         action: Action {
             cooldown: Time::new(1.0),
             engage_radius: Coord::new(10.0),
@@ -176,6 +180,9 @@ fn artillery(assets: &Rc<Assets>) -> UnitTemplate {
         },
         speed: Coord::new(2.0),
         acceleration: Coord::new(10.0),
+        start_action_state: ActionState::Cooldown {
+            time_left: Time::new(3.0),
+        },
         action: Action {
             cooldown: Time::new(5.0),
             engage_radius: Coord::new(20.0),
@@ -219,6 +226,9 @@ fn healer(assets: &Rc<Assets>) -> UnitTemplate {
         },
         speed: Coord::new(2.0),
         acceleration: Coord::new(10.0),
+        start_action_state: ActionState::Cooldown {
+            time_left: Time::new(3.0),
+        },
         action: Action {
             cooldown: Time::new(2.0),
             engage_radius: Coord::new(5.0),
@@ -277,6 +287,9 @@ fn blighter(assets: &Rc<Assets>) -> UnitTemplate {
         },
         speed: Coord::new(2.0),
         acceleration: Coord::new(10.0),
+        start_action_state: ActionState::Cooldown {
+            time_left: Time::new(3.0),
+        },
         action: Action {
             cooldown: Time::new(1.0),
             engage_radius: Coord::new(7.0),
@@ -368,10 +381,62 @@ fn ravager(assets: &Rc<Assets>) -> UnitTemplate {
         },
         speed: Coord::new(2.0),
         acceleration: Coord::new(20.0),
+        start_action_state: ActionState::Cooldown {
+            time_left: Time::new(3.0),
+        },
         action: Action {
             cooldown: Time::ZERO,
             engage_radius: Coord::new(10.0),
             animation: roar,
+        },
+        idle_animation,
+        move_animation,
+        extra_render: None,
+        on_death: Effect::SpawnCoin(Box::new(SpawnCoinEffect {})),
+    }
+}
+
+fn stinger(assets: &Rc<Assets>) -> UnitTemplate {
+    let idle_animation = to_animation(
+        &[assets.enemies.stinger.idle.clone()],
+        1.0 / 32.0,
+        Time::ONE,
+        vec![],
+    );
+    let move_animation = to_animation(&assets.enemies.stinger.walk, 1.0 / 32.0, Time::ONE, vec![]);
+    let attack = to_animation(
+        &assets.enemies.stinger.attack,
+        1.0 / 32.0,
+        Time::ONE,
+        vec![(
+            13,
+            Effect::Damage(Box::new(DamageEffect {
+                damage_type: DamageType::Physical,
+                value: Hp::new(5.0),
+            })),
+        )],
+    );
+    UnitTemplate {
+        ai: UnitAI::Stinger {
+            target: TargetAI::Closest,
+            preferred_height: Coord::new(7.0),
+            preferred_right: false,
+            charge_speed: Coord::new(30.0),
+        },
+        health: Health::new(Hp::new(10.0)),
+        sanity: None,
+        collider: Collider::Aabb {
+            size: vec2(1.0, 2.0).map(Coord::new),
+        },
+        speed: Coord::new(20.0),
+        acceleration: Coord::new(10.0),
+        start_action_state: ActionState::Cooldown {
+            time_left: Time::new(5.0),
+        },
+        action: Action {
+            cooldown: Time::new(5.0),
+            engage_radius: Coord::new(10.0),
+            animation: attack,
         },
         idle_animation,
         move_animation,
