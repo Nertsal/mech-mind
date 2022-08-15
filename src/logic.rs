@@ -5,7 +5,6 @@ use std::collections::VecDeque;
 mod action;
 mod animation;
 mod behaviour;
-mod coins;
 mod deaths;
 mod effects;
 mod movement;
@@ -40,7 +39,6 @@ impl Model {
 
 impl Logic<'_> {
     fn process(&mut self) {
-        self.process_coins();
         self.process_statuses();
         self.process_behaviour();
         self.process_animations();

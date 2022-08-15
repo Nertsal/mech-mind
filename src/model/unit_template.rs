@@ -298,7 +298,7 @@ fn blighter(assets: &Rc<Assets>) -> UnitTemplate {
         idle_animation,
         move_animation,
         extra_render: None,
-        on_death: Effect::SpawnCoin(Box::new(SpawnCoinEffect {})),
+        on_death: Effect::Noop,
     }
 }
 
@@ -392,7 +392,7 @@ fn ravager(assets: &Rc<Assets>) -> UnitTemplate {
         idle_animation,
         move_animation,
         extra_render: None,
-        on_death: Effect::SpawnCoin(Box::new(SpawnCoinEffect {})),
+        on_death: Effect::Noop,
     }
 }
 
@@ -441,6 +441,6 @@ fn stinger(assets: &Rc<Assets>) -> UnitTemplate {
         idle_animation,
         move_animation,
         extra_render: None,
-        on_death: Effect::SpawnCoin(Box::new(SpawnCoinEffect {})),
+        on_death: Effect::Noop,
     }
 }

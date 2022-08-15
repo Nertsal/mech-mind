@@ -24,14 +24,13 @@ pub type Hp = R32;
 pub type Coord = R32;
 pub type Position = Vec2<Coord>;
 pub type Velocity = Vec2<Coord>;
-pub type Currency = i64;
 
 const GRAVITY: Vec2<f32> = vec2(0.0, -9.8);
 
 pub struct Model {
     pub assets: Rc<Assets>,
     pub id_gen: IdGen,
-    pub player_coins: Currency,
+    pub player_energy: Health,
     pub left_border: Coord,
     pub ground_level: Coord,
     pub gravity: Velocity,
@@ -40,7 +39,6 @@ pub struct Model {
     pub templates: UnitTemplates,
     pub projectiles: Collection<Projectile>,
     pub particles: Collection<Particle>,
-    pub coins: Collection<Coin>,
 }
 
 impl Model {
@@ -48,7 +46,10 @@ impl Model {
         Self {
             assets: assets.clone(),
             id_gen: IdGen::new(),
-            player_coins: 0,
+            player_energy: Health {
+                hp: Hp::ZERO,
+                max_hp: Hp::new(100.0),
+            },
             left_border: Coord::new(-20.0),
             ground_level: Coord::new(0.0),
             gravity: GRAVITY.map(Coord::new),
@@ -57,18 +58,8 @@ impl Model {
             templates: UnitTemplates::new(assets),
             projectiles: default(),
             particles: default(),
-            coins: default(),
         }
     }
-}
-
-#[derive(HasId, Debug, Clone)]
-pub struct Coin {
-    pub id: Id,
-    pub alive: bool,
-    pub position: Position,
-    pub radius: Coord,
-    pub collider: Collider,
 }
 
 #[derive(HasId, Debug, Clone)]

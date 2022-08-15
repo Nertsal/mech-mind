@@ -181,16 +181,6 @@ impl Render {
             );
         }
 
-        // Draw coins
-        for coin in &model.coins {
-            draw_2d::Ellipse::circle(
-                coin.position.map(|x| x.as_f32()),
-                coin.radius.as_f32(),
-                Color::YELLOW,
-            )
-            .draw_2d(geng, framebuffer, camera);
-        }
-
         // Hitboxes
         if self.visualize_hitboxes {
             for (pos, collider) in model
@@ -221,18 +211,6 @@ impl Render {
 
         // Health
         for unit in &model.units {
-            fn layout(aabb: AABB<f32>, sprite: Vec2<f32>, pos: Position, ratio: f32) -> AABB<f32> {
-                let pos = pos.map(|x| x.as_f32()) - sprite / 2.0;
-                let mut aabb = AABB {
-                    x_min: aabb.x_min * sprite.x + pos.x,
-                    x_max: aabb.x_max * sprite.x + pos.x,
-                    y_min: aabb.y_min * sprite.y + pos.y,
-                    y_max: aabb.y_max * sprite.y + pos.y,
-                };
-                aabb.x_max = aabb.x_min + aabb.width() * ratio;
-                aabb
-            }
-
             match unit.faction {
                 Faction::Mech => {
                     let sprite = Sprite::new(&self.assets.ui.mech_bar, 0.03);
@@ -243,7 +221,7 @@ impl Render {
                         )
                         .map(Coord::new);
                     // Health bar
-                    let bar_aabb = layout(
+                    let bar_aabb = layout_bar(
                         AABB {
                             x_min: 4.0 / 35.0,
                             x_max: 31.0 / 35.0,
@@ -257,7 +235,7 @@ impl Render {
                     let color = Color::try_from("#7dd46c").unwrap();
                     draw_2d::Quad::new(bar_aabb, color).draw_2d(geng, framebuffer, camera);
                     // Sanity bar
-                    let bar_aabb = layout(
+                    let bar_aabb = layout_bar(
                         AABB {
                             x_min: 7.0 / 35.0,
                             x_max: 28.0 / 35.0,
@@ -283,7 +261,7 @@ impl Render {
                             (unit.animation_state.get_sprite().size.y + sprite.size.y) / 2.0,
                         )
                         .map(Coord::new);
-                    let bar_aabb = layout(
+                    let bar_aabb = layout_bar(
                         AABB {
                             x_min: 6.0 / 34.0,
                             x_max: 33.0 / 34.0,
@@ -307,18 +285,36 @@ impl Render {
         let camera = &geng::PixelPerfectCamera;
         let screen = AABB::ZERO.extend_positive(framebuffer.size().map(|x| x as f32));
 
-        // Currency
-        const CURRENCY_FONT_SIZE: f32 = 20.0;
-        let currency_pos = vec2(screen.center().x, screen.y_max - CURRENCY_FONT_SIZE * 2.0);
-        draw_2d::Text::unit(
-            self.geng.default_font().clone(),
-            &format!("Coins: {}", model.player_coins),
-            Color::WHITE,
-        )
-        .scale_uniform(CURRENCY_FONT_SIZE)
-        .translate(currency_pos)
-        .draw_2d(geng, framebuffer, camera);
+        // Energy
+        let sprite = Sprite::new(&self.assets.ui.energy_bar, 5.0);
+        let position = vec2(screen.center().x, screen.y_max - sprite.size.y / 2.0).map(Coord::new);
+        let bar_aabb = layout_bar(
+            AABB {
+                x_min: 12.0 / 58.0,
+                x_max: 43.0 / 58.0,
+                y_min: 1.0 - 21.0 / 34.0,
+                y_max: 1.0 - 11.0 / 34.0,
+            },
+            sprite.size,
+            position,
+            model.player_energy.ratio().as_f32(),
+        );
+        let color = Color::try_from("#2BD9FE").unwrap();
+        draw_2d::Quad::new(bar_aabb, color).draw_2d(geng, framebuffer, camera);
+        draw_sprite(&sprite, position, false, 0.0, geng, framebuffer, camera);
     }
+}
+
+fn layout_bar(aabb: AABB<f32>, sprite: Vec2<f32>, pos: Position, ratio: f32) -> AABB<f32> {
+    let pos = pos.map(|x| x.as_f32()) - sprite / 2.0;
+    let mut aabb = AABB {
+        x_min: aabb.x_min * sprite.x + pos.x,
+        x_max: aabb.x_max * sprite.x + pos.x,
+        y_min: aabb.y_min * sprite.y + pos.y,
+        y_max: aabb.y_max * sprite.y + pos.y,
+    };
+    aabb.x_max = aabb.x_min + aabb.width() * ratio;
+    aabb
 }
 
 fn draw_aabb_frame(

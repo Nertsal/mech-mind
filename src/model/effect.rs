@@ -8,7 +8,6 @@ pub enum Effect {
     Damage(Box<DamageEffect>),
     Heal(Box<HealEffect>),
     Dash(Box<DashEffect>),
-    SpawnCoin(Box<SpawnCoinEffect>),
 }
 
 #[derive(Debug, Clone)]
@@ -62,9 +61,6 @@ impl Effect {
                 effect.process(context, logic);
             }
             Effect::Dash(effect) => {
-                effect.process(context, logic);
-            }
-            Effect::SpawnCoin(effect) => {
                 effect.process(context, logic);
             }
         }
@@ -241,21 +237,5 @@ impl DashEffect {
             time: self.duration,
             on_contact: self.on_contact,
         })
-    }
-}
-
-impl SpawnCoinEffect {
-    pub fn process(self, context: EffectContext, logic: &mut Logic) {
-        let caster = context.get_expect(Who::Caster, logic);
-        let coin = Coin {
-            position: caster.position,
-            id: logic.model.id_gen.gen(),
-            alive: true,
-            radius: Coord::new(0.2),
-            collider: Collider::Aabb {
-                size: vec2(0.2, 0.2).map(Coord::new),
-            },
-        };
-        logic.model.coins.insert(coin);
     }
 }
