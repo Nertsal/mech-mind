@@ -86,7 +86,7 @@ impl Logic<'_> {
                                 itertools::MinMaxResult::MinMax(min, max) => Some((min, max)),
                             };
                             if let Some((min, max)) = friends {
-                                let target = (min + max) / Coord::new(2.0);
+                                let target = (min + max) / Coord::new(2.0) + Coord::new(0.5);
                                 target - unit.position.x
                             } else {
                                 Coord::ONE
