@@ -232,7 +232,7 @@ impl Render {
                         position,
                         unit.health.ratio().as_f32(),
                     );
-                    let color = Color::try_from("#7dd46c").unwrap();
+                    let color = Color::try_from("#28f000").unwrap();
                     draw_2d::Quad::new(bar_aabb, color).draw_2d(geng, framebuffer, camera);
                     // Sanity bar
                     let bar_aabb = layout_bar(
