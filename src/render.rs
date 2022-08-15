@@ -14,13 +14,13 @@ use background::*;
 use repeating::*;
 
 const FOV: f32 = 20.0;
-const NORMAL_COLOR: Color<f32> = Color {
+const NORMAL_COLOR: Rgba<f32> = Rgba {
     r: 1.0,
     g: 1.0,
     b: 1.0,
     a: 1.0,
 };
-const HOVERED_COLOR: Color<f32> = Color {
+const HOVERED_COLOR: Rgba<f32> = Rgba {
     r: 0.7,
     g: 0.5,
     b: 0.5,
@@ -239,7 +239,7 @@ impl Render {
                         draw_aabb_frame(
                             AABB::point(pos).extend_symmetric(*size / Coord::new(2.0)),
                             Coord::new(0.1),
-                            Color::GREEN,
+                            Rgba::GREEN,
                             geng,
                             framebuffer,
                             camera,
@@ -272,7 +272,7 @@ impl Render {
                         position.map(|x| x.as_f32()),
                         unit.health.ratio().as_f32(),
                     );
-                    let color = Color::try_from("#28f000").unwrap();
+                    let color = Rgba::try_from("#28f000").unwrap();
                     draw_2d::Quad::new(bar_aabb, color).draw_2d(geng, framebuffer, camera);
                     // Sanity bar
                     let bar_aabb = layout_bar(
@@ -289,7 +289,7 @@ impl Render {
                             .map(|sanity| sanity.ratio().as_f32())
                             .unwrap_or(1.0),
                     );
-                    let color = Color::try_from("#d77bba").unwrap();
+                    let color = Rgba::try_from("#d77bba").unwrap();
                     draw_2d::Quad::new(bar_aabb, color).draw_2d(geng, framebuffer, camera);
                     draw_sprite(&sprite, position, false, 0.0, geng, framebuffer, camera);
                 }
@@ -312,7 +312,7 @@ impl Render {
                         position.map(|x| x.as_f32()),
                         unit.health.ratio().as_f32(),
                     );
-                    let color = Color::try_from("#ac3232").unwrap();
+                    let color = Rgba::try_from("#ac3232").unwrap();
                     draw_2d::Quad::new(bar_aabb, color).draw_2d(geng, framebuffer, camera);
                     draw_sprite(&sprite, position, false, 0.0, geng, framebuffer, camera);
                 }
@@ -340,7 +340,7 @@ impl Render {
             position,
             model.player_energy.ratio().as_f32(),
         );
-        let color = Color::try_from("#2BD9FE").unwrap();
+        let color = Rgba::try_from("#2BD9FE").unwrap();
         draw_2d::Quad::new(bar_aabb, color).draw_2d(geng, framebuffer, camera);
         draw_sprite(
             &energy_sprite,
@@ -416,7 +416,7 @@ fn layout_bar(aabb: AABB<f32>, sprite: Vec2<f32>, pos: Vec2<f32>, ratio: f32) ->
 fn draw_aabb_frame(
     aabb: AABB<Coord>,
     width: Coord,
-    color: Color<f32>,
+    color: Rgba<f32>,
     geng: &Geng,
     framebuffer: &mut ugli::Framebuffer,
     camera: &impl geng::AbstractCamera2d,
