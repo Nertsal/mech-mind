@@ -41,7 +41,7 @@ impl Logic<'_> {
     }
 
     fn get_difficulty(&self) -> R32 {
-        let distance = self.model.left_border;
+        let distance = self.model.left_border.max(R32::new(10.0));
         let team_size = self
             .model
             .units
@@ -54,7 +54,7 @@ impl Logic<'_> {
     }
 
     fn generate_wave(&mut self) {
-        let mut difficulty = dbg!(self.get_difficulty());
+        let mut difficulty = self.get_difficulty();
         let mut units = Vec::new();
 
         let templates = vec![
@@ -76,7 +76,8 @@ impl Logic<'_> {
             .waves
             .back()
             .map(|wave| wave.position)
-            .unwrap_or(self.model.left_border) + Coord::new(30.0);
+            .unwrap_or(self.model.left_border)
+            + Coord::new(30.0);
         let wave = Wave { position, units };
         self.model.waves.push_back(wave);
     }

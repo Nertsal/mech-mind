@@ -60,6 +60,22 @@ impl Logic<'_> {
                             })
                         }
                     }
+                } else {
+                    unit.target_velocity = vec2(unit.speed, unit.velocity.y);
+                    if !Rc::ptr_eq(&unit.animation_state.animation, &unit.move_animation) {
+                        let (state, effect) = AnimationState::new(&unit.move_animation);
+                        unit.animation_state = state;
+                        if let Some(effect) = effect {
+                            self.effects.push_front(QueuedEffect {
+                                effect,
+                                context: EffectContext {
+                                    caster: Some(unit.id),
+                                    target: None,
+                                },
+                            })
+                        }
+                    }
+                    return;
                 }
             }
         }
