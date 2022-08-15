@@ -115,6 +115,7 @@ pub struct SwitchAction {
 #[derive(Debug, Clone)]
 pub enum TargetAI {
     Closest,
+    Farthest,
     LowestHp,
 }
 

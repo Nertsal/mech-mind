@@ -276,6 +276,10 @@ fn find_target<'a>(
             .into_iter()
             .filter(|other| other.faction != caster.faction)
             .min_by_key(|other| (caster.position - other.position).len_sqr()),
+        TargetAI::Farthest => units
+            .into_iter()
+            .filter(|other| other.faction != caster.faction)
+            .max_by_key(|other| (caster.position - other.position).len_sqr()),
         TargetAI::LowestHp => units
             .into_iter()
             .filter(|other| other.faction == caster.faction)

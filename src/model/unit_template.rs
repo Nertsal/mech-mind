@@ -277,7 +277,7 @@ fn blighter(assets: &Rc<Assets>) -> UnitTemplate {
     );
     UnitTemplate {
         ai: UnitAI::Engage {
-            target: TargetAI::Closest,
+            target: TargetAI::Farthest,
             switch: None,
         },
         health: Health::new(Hp::new(10.0)),
