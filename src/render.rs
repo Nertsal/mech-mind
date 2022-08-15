@@ -1,3 +1,5 @@
+use std::collections::VecDeque;
+
 use super::*;
 use geng::{Camera2d, Draw2d};
 
@@ -14,9 +16,17 @@ pub struct Render {
     last_cam_pos: Coord,
 }
 
+pub struct Repeating {
+    sprite: Sprite,
+    speed: Coord,
+    placed: VecDeque<Coord>,
+}
+
 pub struct Background {
     objects: Vec<Sprite>,
     placed: Vec<(Position, Coord, Sprite)>,
+    background: Repeating,
+    floor: Repeating,
 }
 
 impl Background {
@@ -29,10 +39,27 @@ impl Background {
                 Sprite::new(&assets.background.tower, 0.03),
                 Sprite::new(&assets.background.town, 0.03),
             ],
+            background: Repeating::new(
+                Sprite::new(
+                    &assets.background.background,
+                    FOV / 2.0 / assets.background.background.size().y as f32,
+                ),
+                Coord::new(1.0),
+            ),
+            floor: Repeating::new(
+                Sprite::new(
+                    &assets.background.floor,
+                    FOV / 2.0 / assets.background.floor.size().y as f32,
+                ),
+                Coord::new(1.0),
+            ),
         }
     }
 
     pub fn update(&mut self, max: Coord, delta_pos: Coord) {
+        self.background.update(max, delta_pos);
+        self.floor.update(max, delta_pos);
+
         // Move objects back
         for (pos, speed, _) in &mut self.placed {
             pos.x -= *speed * delta_pos;
@@ -68,6 +95,41 @@ impl Background {
     }
 }
 
+impl Repeating {
+    pub fn new(sprite: Sprite, speed: Coord) -> Self {
+        Self {
+            sprite,
+            speed,
+            placed: default(),
+        }
+    }
+
+    pub fn update(&mut self, max: Coord, delta_pos: Coord) {
+        // Move
+        for coord in &mut self.placed {
+            *coord -= self.speed * delta_pos;
+        }
+
+        let dx = Coord::new(self.sprite.size.x / 2.0);
+
+        // Remove those that are out of view
+        while let Some(coord) = self.placed.front() {
+            if *coord + dx < Coord::ZERO {
+                self.placed.pop_front();
+            } else {
+                break;
+            }
+        }
+
+        // Add new ones
+        let mut max_pos = self.placed.back().map(|x| *x + dx).unwrap_or(Coord::ZERO);
+        while max_pos < max {
+            self.placed.push_back(max_pos + dx);
+            max_pos += dx + dx;
+        }
+    }
+}
+
 impl Render {
     pub fn new(geng: &Geng, assets: &Rc<Assets>) -> Self {
         Self {
@@ -92,11 +154,36 @@ impl Render {
             Coord::new(camera_width),
             Coord::new(self.camera.center.x) - self.last_cam_pos,
         );
-        for (pos, _, sprite) in &self.background.placed {
-            let pos = *pos + vec2(model.left_border, model.ground_level);
+        for (pos, sprite) in self
+            .background
+            .background
+            .placed
+            .iter()
+            .map(|x| {
+                (
+                    vec2(
+                        *x,
+                        Coord::new(self.background.background.sprite.size.y / 2.0),
+                    ),
+                    &self.background.background.sprite,
+                )
+            })
+            .chain(self.background.floor.placed.iter().map(|x| {
+                (
+                    vec2(*x, -Coord::new(self.background.floor.sprite.size.y / 2.0)),
+                    &self.background.floor.sprite,
+                )
+            }))
+            .chain(
+                self.background
+                    .placed
+                    .iter()
+                    .map(|(pos, _, sprite)| (*pos, sprite)),
+            )
+        {
             draw_sprite(
                 sprite,
-                pos,
+                pos + vec2(model.left_border, model.ground_level),
                 false,
                 0.0,
                 &self.geng,
