@@ -291,23 +291,30 @@ fn blighter(assets: &Rc<Assets>) -> UnitTemplate {
         Time::ONE,
         vec![(
             10,
-            Effect::Projectile(Box::new(ProjectileEffect {
-                offset: vec2(0.0, 0.5).map(Coord::new),
-                ai: ProjectileAI::Idle,
-                collider: Collider::Aabb {
-                    size: vec2(0.5, 0.5).map(Coord::new),
-                },
-                speed: Coord::new(10.0),
-                on_hit: Effect::Damage(Box::new(DamageEffect {
-                    damage_type: DamageType::Physical,
-                    value: Hp::new(2.0),
-                })),
-                animation: to_animation(
-                    &[assets.enemies.blighter.projectile.clone()],
-                    1.0 / 32.0,
-                    Time::ONE,
-                    vec![],
-                ),
+            Effect::List(Box::new(ListEffect {
+                effects: vec![
+                    Effect::Projectile(Box::new(ProjectileEffect {
+                        offset: vec2(0.0, 0.5).map(Coord::new),
+                        ai: ProjectileAI::Idle,
+                        collider: Collider::Aabb {
+                            size: vec2(0.5, 0.5).map(Coord::new),
+                        },
+                        speed: Coord::new(10.0),
+                        on_hit: Effect::Damage(Box::new(DamageEffect {
+                            damage_type: DamageType::Physical,
+                            value: Hp::new(2.0),
+                        })),
+                        animation: to_animation(
+                            &[assets.enemies.blighter.projectile.clone()],
+                            1.0 / 32.0,
+                            Time::ONE,
+                            vec![],
+                        ),
+                    })),
+                    Effect::Sound(Box::new(SoundEffect {
+                        sound: assets.sound_design.enemies.blighter.shoot.clone(),
+                    })),
+                ],
             })),
         )],
     );
@@ -347,7 +354,17 @@ fn ravager(assets: &Rc<Assets>) -> UnitTemplate {
         vec![],
     );
     let move_animation = to_animation(&assets.enemies.ravager.walk, 1.0 / 32.0, Time::ONE, vec![]);
-    let roar = to_animation(&assets.enemies.ravager.roar, 1.0 / 32.0, Time::ONE, vec![]);
+    let roar = to_animation(
+        &assets.enemies.ravager.roar,
+        1.0 / 32.0,
+        Time::ONE,
+        vec![(
+            1,
+            Effect::Sound(Box::new(SoundEffect {
+                sound: assets.sound_design.enemies.ravager.roar.clone(),
+            })),
+        )],
+    );
     let anticipation = to_animation(
         &assets.enemies.ravager.anticipation,
         1.0 / 32.0,
@@ -360,21 +377,41 @@ fn ravager(assets: &Rc<Assets>) -> UnitTemplate {
         Time::ONE,
         vec![(
             1,
-            Effect::Dash(Box::new(DashEffect {
-                speed: Coord::new(15.0),
-                duration: Time::new(0.5),
-                on_contact: Effect::Damage(Box::new(DamageEffect {
-                    damage_type: DamageType::Physical,
-                    value: Hp::new(5.0),
-                })),
+            Effect::List(Box::new(ListEffect {
+                effects: vec![
+                    Effect::Dash(Box::new(DashEffect {
+                        speed: Coord::new(15.0),
+                        duration: Time::new(0.5),
+                        on_contact: Effect::Damage(Box::new(DamageEffect {
+                            damage_type: DamageType::Physical,
+                            value: Hp::new(5.0),
+                        })),
+                    })),
+                    Effect::Sound(Box::new(SoundEffect {
+                        sound: assets.sound_design.enemies.ravager.charge.clone(),
+                    })),
+                ],
             })),
         )],
     );
     let attack = to_animation(
-        &assets.enemies.ravager.charge,
+        &assets.enemies.ravager.attack,
         1.0 / 32.0,
         Time::ONE,
-        vec![],
+        vec![(
+            3,
+            Effect::List(Box::new(ListEffect {
+                effects: vec![
+                    Effect::Damage(Box::new(DamageEffect {
+                        damage_type: DamageType::Physical,
+                        value: Hp::new(1.0),
+                    })),
+                    Effect::Sound(Box::new(SoundEffect {
+                        sound: assets.sound_design.enemies.ravager.bite.clone(),
+                    })),
+                ],
+            })),
+        )],
     );
     UnitTemplate {
         ai: UnitAI::Engage {

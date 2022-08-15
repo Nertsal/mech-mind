@@ -38,6 +38,8 @@ pub struct BlighterSounds {
 #[derive(geng::Assets)]
 pub struct RavagerSounds {
     pub roar: Rc<Sound>,
+    pub charge: Rc<Sound>,
+    pub bite: Rc<Sound>,
     pub walk: Rc<Sound>,
 }
 
