@@ -293,13 +293,15 @@ impl Render {
 
         // Energy
         let sprite = Sprite::new(&self.assets.ui.energy_bar, 5.0);
-        let position = vec2(screen.center().x, screen.y_max - sprite.size.y / 2.0).map(Coord::new);
+        let position = (vec2(0.5 - 100.0 / 258.0, 110.0 / 158.0 - 0.5) * sprite.size
+            + vec2(screen.center().x, screen.y_max))
+        .map(Coord::new);
         let bar_aabb = layout_bar(
             AABB {
-                x_min: 12.0 / 58.0,
-                x_max: 43.0 / 58.0,
-                y_min: 1.0 - 21.0 / 34.0,
-                y_max: 1.0 - 11.0 / 34.0,
+                x_min: 84.0 / 258.0,
+                x_max: 115.0 / 258.0,
+                y_min: 1.0 - 132.0 / 158.0,
+                y_max: 1.0 - 122.0 / 158.0,
             },
             sprite.size,
             position,
