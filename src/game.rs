@@ -15,6 +15,7 @@ pub struct Game {
 pub enum PlayerEvent {
     SpawnMech {
         template: UnitTemplate,
+        cost: Currency,
     }
 }
 

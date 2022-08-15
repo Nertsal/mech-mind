@@ -24,6 +24,7 @@ pub type Hp = R32;
 pub type Coord = R32;
 pub type Position = Vec2<Coord>;
 pub type Velocity = Vec2<Coord>;
+pub type Currency = R32;
 
 const GRAVITY: Vec2<f32> = vec2(0.0, -9.8);
 
