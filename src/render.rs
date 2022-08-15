@@ -18,6 +18,11 @@ impl Render {
     }
 
     pub fn draw(&mut self, model: &Model, framebuffer: &mut ugli::Framebuffer) {
+        self.draw_world(model, framebuffer);
+        self.draw_ui(model, framebuffer);
+    }
+
+    fn draw_world(&mut self, model: &Model, framebuffer: &mut ugli::Framebuffer) {
         let geng = &self.geng;
         let camera = &model.camera;
 
@@ -115,6 +120,24 @@ impl Render {
             )
             .draw_2d(geng, framebuffer, camera);
         }
+    }
+
+    fn draw_ui(&mut self, model: &Model, framebuffer: &mut ugli::Framebuffer) {
+        let geng = &self.geng;
+        let camera = &geng::PixelPerfectCamera;
+        let screen = AABB::ZERO.extend_positive(framebuffer.size().map(|x| x as f32));
+
+        // Currency
+        const CURRENCY_FONT_SIZE: f32 = 20.0;
+        let currency_pos = vec2(screen.center().x, screen.y_max - CURRENCY_FONT_SIZE * 2.0);
+        draw_2d::Text::unit(
+            self.geng.default_font().clone(),
+            &format!("Coins: {}", model.player_coins),
+            Color::WHITE,
+        )
+        .scale_uniform(CURRENCY_FONT_SIZE)
+        .translate(currency_pos)
+        .draw_2d(geng, framebuffer, camera);
     }
 }
 
