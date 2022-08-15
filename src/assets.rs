@@ -24,7 +24,6 @@ pub struct SoundAssets {
 
 #[derive(geng::Assets)]
 pub struct EnemySounds {
-    #[asset(path = "death.mp3")]
     pub death: Rc<Sound>,
     pub blighter: BlighterSounds,
     pub ravager: RavagerSounds,
@@ -32,27 +31,20 @@ pub struct EnemySounds {
 
 #[derive(geng::Assets)]
 pub struct BlighterSounds {
-    #[asset(path = "shoot.mp3")]
     pub shoot: Rc<Sound>,
-    #[asset(path = "walk.mp3")]
     pub walk: Rc<Sound>,
 }
 
 #[derive(geng::Assets)]
 pub struct RavagerSounds {
-    #[asset(path = "roar.mp3")]
     pub roar: Rc<Sound>,
-    #[asset(path = "walk.mp3")]
     pub walk: Rc<Sound>,
 }
 
 #[derive(geng::Assets)]
 pub struct MechSounds {
-    #[asset(path = "death.mp3")]
     pub death: Rc<Sound>,
-    #[asset(path = "hit.mp3")]
     pub hit: Rc<Sound>,
-    #[asset(path = "walk.mp3")]
     pub walk: Rc<Sound>,
     pub sanity_zero: Rc<Sound>,
     pub artillery: ArtillerySounds,
@@ -62,7 +54,6 @@ pub struct MechSounds {
 
 #[derive(geng::Assets)]
 pub struct TankSounds {
-    #[asset(path = "shoot.mp3")]
     pub shoot: Rc<Sound>,
 }
 
@@ -73,9 +64,7 @@ pub struct HealerSounds {
 
 #[derive(geng::Assets)]
 pub struct ArtillerySounds {
-    #[asset(path = "artillery_shoot.mp3")]
     pub artillery_shoot: Rc<Sound>,
-    #[asset(path = "rocket_explode.mp3")]
     pub rocket_explode: Rc<Sound>,
 }
 
@@ -190,5 +179,7 @@ pub struct TankMech {
 }
 
 impl Assets {
-    pub fn process(&mut self, _geng: &Geng) {}
+    pub fn process(&mut self, _geng: &Geng) {
+        Rc::get_mut(&mut self.sound_design.lava).unwrap().looped = true;
+    }
 }

@@ -44,7 +44,7 @@ pub struct Model {
 
 impl Model {
     pub fn new(assets: &Rc<Assets>) -> Self {
-        Self {
+        let mut model = Self {
             assets: assets.clone(),
             id_gen: IdGen::new(),
             player_energy: Health {
@@ -59,7 +59,9 @@ impl Model {
             templates: UnitTemplates::new(assets),
             projectiles: default(),
             particles: default(),
-        }
+        };
+        model.play_sound(&assets.sound_design.lava);
+        model
     }
 
     pub fn play_sound(&mut self, sound: &Rc<geng::Sound>) {
