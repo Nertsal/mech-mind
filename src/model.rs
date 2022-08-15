@@ -1,5 +1,4 @@
 use super::*;
-use geng::Camera2d;
 
 mod animation;
 mod collider;
@@ -24,19 +23,37 @@ pub type Velocity = Vec2<Coord>;
 pub type Currency = i64;
 
 const GRAVITY: Vec2<f32> = vec2(0.0, -9.8);
-const FOV: f32 = 20.0;
 
 pub struct Model {
     pub assets: Rc<Assets>,
     pub id_gen: IdGen,
     pub player_coins: Currency,
+    pub left_border: Coord,
+    pub ground_level: Coord,
     pub gravity: Velocity,
-    pub camera: Camera2d,
     pub units: Collection<Unit>,
     pub templates: UnitTemplates,
     pub projectiles: Collection<Projectile>,
     pub particles: Collection<Particle>,
     pub coins: Collection<Coin>,
+}
+
+impl Model {
+    pub fn new(assets: &Rc<Assets>) -> Self {
+        Self {
+            assets: assets.clone(),
+            id_gen: IdGen::new(),
+            player_coins: 0,
+            left_border: Coord::new(-20.0),
+            ground_level: Coord::new(0.0),
+            gravity: GRAVITY.map(Coord::new),
+            units: default(),
+            templates: UnitTemplates::new(assets),
+            projectiles: default(),
+            particles: default(),
+            coins: default(),
+        }
+    }
 }
 
 #[derive(HasId, Debug, Clone)]
@@ -186,25 +203,4 @@ pub struct Projectile {
     pub position: Position,
     pub velocity: Velocity,
     pub animation_state: AnimationState,
-}
-
-impl Model {
-    pub fn new(assets: &Rc<Assets>) -> Self {
-        Self {
-            assets: assets.clone(),
-            id_gen: IdGen::new(),
-            player_coins: 0,
-            gravity: GRAVITY.map(Coord::new),
-            camera: Camera2d {
-                center: Vec2::ZERO,
-                rotation: 0.0,
-                fov: FOV,
-            },
-            units: default(),
-            templates: UnitTemplates::new(assets),
-            projectiles: default(),
-            particles: default(),
-            coins: default(),
-        }
-    }
 }

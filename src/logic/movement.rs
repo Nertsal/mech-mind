@@ -17,10 +17,16 @@ impl Logic<'_> {
         };
         unit.velocity += acceleration + self.model.gravity * self.delta_time;
         unit.position += unit.velocity * self.delta_time;
-        if unit.position.y <= Coord::ZERO {
-            // 0 is considered floor level
-            unit.position.y = Coord::ZERO;
+
+        // Check ground
+        if unit.position.y <= self.model.ground_level {
+            unit.position.y = self.model.ground_level;
             unit.velocity.y = Coord::ZERO;
+        }
+        // Check left border
+        if unit.position.x <= self.model.left_border {
+            unit.position.x = self.model.left_border;
+            unit.velocity.x = Coord::ZERO;
         }
 
         unit.flip_sprite = match unit.velocity.x.cmp(&Coord::ZERO) {

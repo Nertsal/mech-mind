@@ -57,6 +57,9 @@ impl Logic<'_> {
                         },
                     });
                 }
+                if projectile.position.y <= self.model.ground_level {
+                    projectile.lifetime = Time::ZERO;
+                }
             }
         }
 

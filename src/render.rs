@@ -1,12 +1,15 @@
 use super::*;
+use geng::{Camera2d, Draw2d};
 
-use geng::Draw2d;
 use model::*;
+
+const FOV: f32 = 20.0;
 
 #[allow(dead_code)]
 pub struct Render {
     geng: Geng,
     assets: Rc<Assets>,
+    camera: Camera2d,
 }
 
 impl Render {
@@ -14,17 +17,26 @@ impl Render {
         Self {
             geng: geng.clone(),
             assets: assets.clone(),
+            camera: Camera2d {
+                center: Vec2::ZERO,
+                rotation: 0.0,
+                fov: FOV,
+            },
         }
     }
 
     pub fn draw(&mut self, model: &Model, framebuffer: &mut ugli::Framebuffer) {
+        let framebuffer_size = framebuffer.size().map(|x| x as f32);
+        let camera_width = self.camera.fov * framebuffer_size.x / framebuffer_size.y;
+        self.camera.center.x = model.left_border.as_f32() + camera_width / 2.0;
+
         self.draw_world(model, framebuffer);
         self.draw_ui(model, framebuffer);
     }
 
     fn draw_world(&mut self, model: &Model, framebuffer: &mut ugli::Framebuffer) {
         let geng = &self.geng;
-        let camera = &model.camera;
+        let camera = &self.camera;
 
         // Draw units
         for unit in &model.units {

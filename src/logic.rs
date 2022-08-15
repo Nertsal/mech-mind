@@ -3,15 +3,16 @@ use model::*;
 use std::collections::VecDeque;
 
 mod action;
-mod coins;
 mod animation;
 mod behaviour;
+mod coins;
 mod deaths;
 mod effects;
 mod movement;
-mod projectiles;
 mod particles;
+mod projectiles;
 mod statuses;
+mod waves;
 
 pub use effects::*;
 
@@ -49,6 +50,7 @@ impl Logic<'_> {
         self.process_particles();
         self.process_effects();
         self.process_deaths();
+        self.process_waves();
     }
 
     fn process_units(&mut self, mut f: impl FnMut(&mut Self, &mut Unit)) {
