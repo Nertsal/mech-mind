@@ -2,6 +2,7 @@ use super::*;
 
 mod pixel_texture;
 
+use geng::Sound;
 pub use pixel_texture::*;
 
 #[derive(geng::Assets)]
@@ -11,6 +12,69 @@ pub struct Assets {
     pub enemies: EnemyAssets,
     pub mech: MechAssets,
     pub ui: UIAssets,
+    pub sound_design: SoundAssets,
+}
+
+#[derive(geng::Assets)]
+pub struct SoundAssets {
+    pub lava: Rc<Sound>,
+    pub mechs: MechSounds,
+    pub enemies: EnemySounds,
+}
+
+#[derive(geng::Assets)]
+pub struct EnemySounds {
+    #[asset(path = "death.mp3")]
+    pub death: Rc<Sound>,
+    pub blighter: BlighterSounds,
+    pub ravager: RavagerSounds,
+}
+
+#[derive(geng::Assets)]
+pub struct BlighterSounds {
+    #[asset(path = "shoot.mp3")]
+    pub shoot: Rc<Sound>,
+    #[asset(path = "walk.mp3")]
+    pub walk: Rc<Sound>,
+}
+
+#[derive(geng::Assets)]
+pub struct RavagerSounds {
+    #[asset(path = "roar.mp3")]
+    pub roar: Rc<Sound>,
+    #[asset(path = "walk.mp3")]
+    pub walk: Rc<Sound>,
+}
+
+#[derive(geng::Assets)]
+pub struct MechSounds {
+    #[asset(path = "death.mp3")]
+    pub death: Rc<Sound>,
+    #[asset(path = "hit.mp3")]
+    pub hit: Rc<Sound>,
+    #[asset(path = "walk.mp3")]
+    pub walk: Rc<Sound>,
+    pub sanity_zero: Rc<Sound>,
+    pub tank: TankSounds,
+}
+
+#[derive(geng::Assets)]
+pub struct TankSounds {
+    #[asset(path = "shoot.mp3")]
+    pub shoot: Rc<Sound>,
+}
+
+#[derive(geng::Assets)]
+pub struct HealerSounds {
+    pub heal_effect: Rc<Sound>,
+}
+
+#[derive(geng::Assets)]
+pub struct ArtillerySounds {
+    #[asset(path = "artillery_shoot.mp3")]
+    pub artillery_shoot: Rc<Sound>,
+    #[asset(path = "rocket_explode.mp3")]
+    pub rocket_explode: Rc<Sound>,
 }
 
 #[derive(geng::Assets)]
