@@ -11,6 +11,10 @@ impl Health {
         Self { hp: max_hp, max_hp }
     }
 
+    pub fn ratio(&self) -> Hp {
+        self.hp / self.max_hp
+    }
+
     pub fn change(&mut self, delta: Hp) {
         self.hp = (self.hp + delta).min(self.max_hp).max(Hp::ZERO);
     }

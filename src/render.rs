@@ -218,6 +218,57 @@ impl Render {
                 }
             }
         }
+
+        // Health
+        for unit in &model.units {
+            fn layout(aabb: AABB<f32>, sprite: Vec2<f32>, pos: Position, ratio: f32) -> AABB<f32> {
+                let pos = pos.map(|x| x.as_f32()) - sprite / 2.0;
+                let mut aabb = AABB {
+                    x_min: aabb.x_min * sprite.x + pos.x,
+                    x_max: aabb.x_max * sprite.x + pos.x,
+                    y_min: aabb.y_min * sprite.y + pos.y,
+                    y_max: aabb.y_max * sprite.y + pos.y,
+                };
+                aabb.x_max = aabb.x_min + aabb.width() * ratio;
+                aabb
+            }
+
+            match unit.faction {
+                Faction::Mech => {
+                    let sprite = Sprite::new(&self.assets.ui.mech_bar, 0.03);
+                    let position = unit.position
+                        + vec2(
+                            0.0,
+                            (unit.animation_state.get_sprite().size.y + sprite.size.y) / 2.0,
+                        )
+                        .map(Coord::new);
+                    draw_sprite(&sprite, position, false, 0.0, geng, framebuffer, camera);
+                }
+                Faction::Alien => {
+                    let sprite = Sprite::new(&self.assets.ui.enemy_health, 0.03);
+                    let position = unit.position
+                        + vec2(
+                            0.0,
+                            (unit.animation_state.get_sprite().size.y + sprite.size.y) / 2.0,
+                        )
+                        .map(Coord::new);
+                    let bar_aabb = layout(
+                        AABB {
+                            x_min: 6.0 / 34.0,
+                            x_max: 33.0 / 34.0,
+                            y_min: 1.0 - 13.0 / 18.0,
+                            y_max: 1.0 - 9.0 / 18.0,
+                        },
+                        sprite.size,
+                        position,
+                        unit.health.ratio().as_f32(),
+                    );
+                    let color = Color::try_from("#ac3232").unwrap();
+                    draw_2d::Quad::new(bar_aabb, color).draw_2d(geng, framebuffer, camera);
+                    draw_sprite(&sprite, position, false, 0.0, geng, framebuffer, camera);
+                }
+            }
+        }
     }
 
     fn draw_ui(&mut self, model: &Model, framebuffer: &mut ugli::Framebuffer) {
