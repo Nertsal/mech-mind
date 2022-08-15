@@ -14,6 +14,18 @@ use background::*;
 use repeating::*;
 
 const FOV: f32 = 20.0;
+const NORMAL_COLOR: Color<f32> = Color {
+    r: 1.0,
+    g: 1.0,
+    b: 1.0,
+    a: 1.0,
+};
+const HOVERED_COLOR: Color<f32> = Color {
+    r: 0.7,
+    g: 0.5,
+    b: 0.5,
+    a: 1.0,
+};
 
 #[allow(dead_code)]
 pub struct Render {
@@ -235,7 +247,7 @@ impl Render {
                             y_max: 1.0 - 15.0 / 27.0,
                         },
                         sprite.size,
-                        position,
+                        position.map(|x| x.as_f32()),
                         unit.health.ratio().as_f32(),
                     );
                     let color = Color::try_from("#28f000").unwrap();
@@ -249,7 +261,7 @@ impl Render {
                             y_max: 1.0 - 23.0 / 27.0,
                         },
                         sprite.size,
-                        position,
+                        position.map(|x| x.as_f32()),
                         unit.sanity
                             .as_ref()
                             .map(|sanity| sanity.ratio().as_f32())
@@ -275,7 +287,7 @@ impl Render {
                             y_max: 1.0 - 9.0 / 18.0,
                         },
                         sprite.size,
-                        position,
+                        position.map(|x| x.as_f32()),
                         unit.health.ratio().as_f32(),
                     );
                     let color = Color::try_from("#ac3232").unwrap();
@@ -292,10 +304,9 @@ impl Render {
         let screen = AABB::ZERO.extend_positive(framebuffer.size().map(|x| x as f32));
 
         // Energy
-        let sprite = Sprite::new(&self.assets.ui.energy_bar, 5.0);
-        let position = (vec2(0.5 - 100.0 / 258.0, 110.0 / 158.0 - 0.5) * sprite.size
-            + vec2(screen.center().x, screen.y_max))
-        .map(Coord::new);
+        let energy_sprite = Sprite::new(&self.assets.ui.energy_bar, 5.0);
+        let position = vec2(0.5 - 100.0 / 258.0, 110.0 / 158.0 - 0.5) * energy_sprite.size
+            + vec2(screen.center().x, screen.y_max);
         let bar_aabb = layout_bar(
             AABB {
                 x_min: 84.0 / 258.0,
@@ -303,18 +314,70 @@ impl Render {
                 y_min: 1.0 - 132.0 / 158.0,
                 y_max: 1.0 - 122.0 / 158.0,
             },
-            sprite.size,
+            energy_sprite.size,
             position,
             model.player_energy.ratio().as_f32(),
         );
         let color = Color::try_from("#2BD9FE").unwrap();
         draw_2d::Quad::new(bar_aabb, color).draw_2d(geng, framebuffer, camera);
-        draw_sprite(&sprite, position, false, 0.0, geng, framebuffer, camera);
+        draw_sprite(
+            &energy_sprite,
+            position.map(Coord::new),
+            false,
+            0.0,
+            geng,
+            framebuffer,
+            camera,
+        );
+
+        // Slots
+        let energy_size = energy_sprite.size / vec2(258.0, -158.0);
+        let energy_pos = position + vec2(-energy_sprite.size.x, energy_sprite.size.y) / 2.0;
+        let mouse_pos = self.geng.window().mouse_pos().map(|x| x as f32);
+
+        // Artillery
+        let sprite = Sprite::new(&self.assets.ui.artillery_slot, 4.0);
+        let back = self.assets.ui.artillery_slot_bg.texture();
+        let position = vec2(150.0, 130.0) * energy_size + energy_pos;
+        let aabb = AABB::point(position).extend_symmetric(sprite.size / 2.0);
+        let color = if aabb.contains(mouse_pos) {
+            HOVERED_COLOR
+        } else {
+            NORMAL_COLOR
+        };
+        draw_2d::TexturedQuad::colored(aabb, back, color).draw_2d(geng, framebuffer, camera);
+        draw_2d::TexturedQuad::new(aabb, sprite.texture).draw_2d(geng, framebuffer, camera);
+
+        // Tank
+        let sprite = Sprite::new(&self.assets.ui.tank_slot, 4.0);
+        let back = self.assets.ui.tank_slot_bg.texture();
+        let position = vec2(175.0, 130.0) * energy_size + energy_pos;
+        let aabb = AABB::point(position).extend_symmetric(sprite.size / 2.0);
+        let color = if aabb.contains(mouse_pos) {
+            HOVERED_COLOR
+        } else {
+            NORMAL_COLOR
+        };
+        draw_2d::TexturedQuad::colored(aabb, back, color).draw_2d(geng, framebuffer, camera);
+        draw_2d::TexturedQuad::new(aabb, sprite.texture).draw_2d(geng, framebuffer, camera);
+
+        // Healer
+        let sprite = Sprite::new(&self.assets.ui.healer_slot, 4.0);
+        let back = self.assets.ui.healer_slot_bg.texture();
+        let position = vec2(200.0, 130.0) * energy_size + energy_pos;
+        let aabb = AABB::point(position).extend_symmetric(sprite.size / 2.0);
+        let color = if aabb.contains(mouse_pos) {
+            HOVERED_COLOR
+        } else {
+            NORMAL_COLOR
+        };
+        draw_2d::TexturedQuad::colored(aabb, back, color).draw_2d(geng, framebuffer, camera);
+        draw_2d::TexturedQuad::new(aabb, sprite.texture).draw_2d(geng, framebuffer, camera);
     }
 }
 
-fn layout_bar(aabb: AABB<f32>, sprite: Vec2<f32>, pos: Position, ratio: f32) -> AABB<f32> {
-    let pos = pos.map(|x| x.as_f32()) - sprite / 2.0;
+fn layout_bar(aabb: AABB<f32>, sprite: Vec2<f32>, pos: Vec2<f32>, ratio: f32) -> AABB<f32> {
+    let pos = pos - sprite / 2.0;
     let mut aabb = AABB {
         x_min: aabb.x_min * sprite.x + pos.x,
         x_max: aabb.x_max * sprite.x + pos.x,
