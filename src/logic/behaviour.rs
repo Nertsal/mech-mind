@@ -62,9 +62,14 @@ impl Logic<'_> {
                                 .filter(|other| other.faction == unit.faction)
                                 .map(|other| other.position.x)
                                 .min();
-                            match friend.filter(|min| unit.position.x - *min < Coord::new(7.0)) {
-                                Some(_) => Coord::ONE,
-                                None => Coord::ZERO,
+                            if let Some(min) = friend {
+                                if unit.position.x - min < Coord::new(7.0) {
+                                    Coord::ONE
+                                } else {
+                                    Coord::ZERO
+                                }
+                            } else {
+                                Coord::ONE
                             }
                         }
                         PositionAI::Follow => {
