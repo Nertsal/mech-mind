@@ -130,6 +130,9 @@ impl Logic<'_> {
                             }
                         }
                     }
+
+                    // Look at the target
+                    unit.flip_sprite = (target_pos - unit.position).x < Coord::ZERO;
                 }
             }
         }
