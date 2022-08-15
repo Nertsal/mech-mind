@@ -11,6 +11,13 @@ pub struct Game {
     model: Model,
 }
 
+#[derive(Debug)]
+pub enum PlayerEvent {
+    SpawnMech {
+        template: UnitTemplate,
+    }
+}
+
 impl Game {
     pub fn new(geng: &Geng, assets: &Rc<Assets>) -> Self {
         Self {
@@ -80,6 +87,10 @@ impl geng::State for Game {
                 _ => {}
             },
             _ => {}
+        }
+
+        for event in self.render.handle_event(event) {
+            self.model.handle_event(event);
         }
     }
 

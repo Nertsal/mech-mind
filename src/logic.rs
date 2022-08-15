@@ -7,6 +7,7 @@ mod animation;
 mod behaviour;
 mod deaths;
 mod effects;
+mod handle_event;
 mod movement;
 mod particles;
 mod projectiles;

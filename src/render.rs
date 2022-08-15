@@ -1,5 +1,7 @@
 use std::collections::VecDeque;
 
+use crate::game::PlayerEvent;
+
 use super::*;
 use geng::{Camera2d, Draw2d};
 
@@ -37,6 +39,10 @@ impl Render {
             last_cam_pos: Coord::ZERO,
             visualize_hitboxes: false,
         }
+    }
+
+    pub fn handle_event(&mut self, event: geng::Event) -> Vec<PlayerEvent> {
+        vec![]
     }
 
     pub fn draw(&mut self, model: &Model, framebuffer: &mut ugli::Framebuffer) {
