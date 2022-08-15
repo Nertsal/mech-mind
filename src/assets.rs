@@ -55,7 +55,9 @@ pub struct MechSounds {
     #[asset(path = "walk.mp3")]
     pub walk: Rc<Sound>,
     pub sanity_zero: Rc<Sound>,
+    pub artillery: ArtillerySounds,
     pub tank: TankSounds,
+    pub healer: HealerSounds,
 }
 
 #[derive(geng::Assets)]

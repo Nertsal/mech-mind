@@ -145,27 +145,46 @@ fn artillery(assets: &Rc<Assets>) -> UnitTemplate {
         Time::ONE,
         vec![(
             2,
-            Effect::Projectile(Box::new(ProjectileEffect {
-                offset: vec2(-0.5, 0.5).map(Coord::new),
-                ai: ProjectileAI::Rocket {
-                    speed: Coord::new(15.0),
-                    acceleration: Coord::new(20.0),
-                    preferred_height: Coord::new(7.0),
-                },
-                collider: Collider::Aabb {
-                    size: vec2(0.5, 0.5).map(Coord::new),
-                },
-                speed: Coord::ZERO,
-                on_hit: Effect::Damage(Box::new(DamageEffect {
-                    damage_type: DamageType::Explosive,
-                    value: Hp::new(3.0),
-                })),
-                animation: to_animation(
-                    &assets.mech.artillery.projectile_anim,
-                    1.0 / 24.0,
-                    Time::ONE,
-                    vec![],
-                ),
+            Effect::List(Box::new(ListEffect {
+                effects: vec![
+                    Effect::Projectile(Box::new(ProjectileEffect {
+                        offset: vec2(-0.5, 0.5).map(Coord::new),
+                        ai: ProjectileAI::Rocket {
+                            speed: Coord::new(15.0),
+                            acceleration: Coord::new(20.0),
+                            preferred_height: Coord::new(7.0),
+                        },
+                        collider: Collider::Aabb {
+                            size: vec2(0.5, 0.5).map(Coord::new),
+                        },
+                        speed: Coord::ZERO,
+                        on_hit: Effect::List(Box::new(ListEffect {
+                            effects: vec![
+                                Effect::Damage(Box::new(DamageEffect {
+                                    damage_type: DamageType::Explosive,
+                                    value: Hp::new(3.0),
+                                })),
+                                Effect::Sound(Box::new(SoundEffect {
+                                    sound: assets
+                                        .sound_design
+                                        .mechs
+                                        .artillery
+                                        .rocket_explode
+                                        .clone(),
+                                })),
+                            ],
+                        })),
+                        animation: to_animation(
+                            &assets.mech.artillery.projectile_anim,
+                            1.0 / 24.0,
+                            Time::ONE,
+                            vec![],
+                        ),
+                    })),
+                    Effect::Sound(Box::new(SoundEffect {
+                        sound: assets.sound_design.mechs.artillery.artillery_shoot.clone(),
+                    })),
+                ],
             })),
         )],
     );

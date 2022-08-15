@@ -61,6 +61,10 @@ impl Model {
             particles: default(),
         }
     }
+
+    pub fn play_sound(&mut self, sound: &Rc<geng::Sound>) {
+        let _sound = sound.play();
+    }
 }
 
 #[derive(HasId, Debug, Clone)]

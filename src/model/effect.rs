@@ -4,10 +4,22 @@ use logic::*;
 #[derive(Debug, Clone)]
 pub enum Effect {
     Noop,
+    List(Box<ListEffect>),
+    Sound(Box<SoundEffect>),
     Projectile(Box<ProjectileEffect>),
     Damage(Box<DamageEffect>),
     Heal(Box<HealEffect>),
     Dash(Box<DashEffect>),
+}
+
+#[derive(Debug, Clone)]
+pub struct ListEffect {
+    pub effects: Vec<Effect>,
+}
+
+#[derive(Clone)]
+pub struct SoundEffect {
+    pub sound: Rc<geng::Sound>,
 }
 
 #[derive(Debug, Clone)]
@@ -61,6 +73,12 @@ impl Effect {
                 effect.process(context, logic);
             }
             Effect::Dash(effect) => {
+                effect.process(context, logic);
+            }
+            Effect::Sound(effect) => {
+                effect.process(context, logic);
+            }
+            Effect::List(effect) => {
                 effect.process(context, logic);
             }
         }
@@ -237,5 +255,28 @@ impl DashEffect {
             time: self.duration,
             on_contact: self.on_contact,
         })
+    }
+}
+
+impl ListEffect {
+    pub fn process(self, context: EffectContext, logic: &mut Logic) {
+        for effect in self.effects {
+            logic.effects.push_front(QueuedEffect {
+                effect,
+                context: context.clone(),
+            });
+        }
+    }
+}
+
+impl SoundEffect {
+    pub fn process(self, _context: EffectContext, logic: &mut Logic) {
+        logic.model.play_sound(&self.sound);
+    }
+}
+
+impl Debug for SoundEffect {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct(stringify!(SoundEffect)).finish()
     }
 }
