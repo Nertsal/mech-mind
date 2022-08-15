@@ -367,7 +367,7 @@ fn ravager(assets: &Rc<Assets>) -> UnitTemplate {
             size: vec2(2.0, 1.0).map(Coord::new),
         },
         speed: Coord::new(2.0),
-        acceleration: Coord::new(10.0),
+        acceleration: Coord::new(20.0),
         action: Action {
             cooldown: Time::ZERO,
             engage_radius: Coord::new(10.0),
