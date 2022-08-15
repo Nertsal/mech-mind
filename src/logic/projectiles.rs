@@ -27,7 +27,8 @@ impl Logic<'_> {
                         }
                     }
                     projectile.velocity += (target_velocity - projectile.velocity)
-                        .clamp_len(..=*acceleration * self.delta_time);
+                        .clamp_len(..=*acceleration * self.delta_time)
+                        - self.model.gravity * self.delta_time;
                 }
             }
         }
