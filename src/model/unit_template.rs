@@ -43,7 +43,7 @@ pub fn to_animation(
     textures: &[assets::PixelTexture],
     sprite_scale: f32,
     cycle_time: Time,
-    action: Option<(usize, Effect)>,
+    actions: Vec<(usize, Effect)>,
 ) -> Rc<Animation> {
     let time = cycle_time / Time::new(textures.len() as f32);
     Rc::new(Animation {
@@ -54,7 +54,7 @@ pub fn to_animation(
                 .map(|(frame, texture)| AnimationFrame {
                     sprite: Sprite::new(&texture.texture(), sprite_scale),
                     time,
-                    start_effect: action.as_ref().and_then(|(action_frame, action)| {
+                    start_effect: actions.iter().find_map(|(action_frame, action)| {
                         (frame == *action_frame).then(|| action.clone())
                     }),
                 })
@@ -68,14 +68,14 @@ fn tank(assets: &Rc<Assets>) -> UnitTemplate {
         &[assets.mech.tank.idle.clone()],
         1.0 / 32.0,
         Time::ONE,
-        None,
+        vec![],
     );
-    let move_animation = to_animation(&assets.mech.tank.walk, 1.0 / 32.0, Time::ONE, None);
+    let move_animation = to_animation(&assets.mech.tank.walk, 1.0 / 32.0, Time::ONE, vec![]);
     let animation = to_animation(
         &assets.mech.tank.attack,
         1.0 / 32.0,
         Time::ONE,
-        Some((
+        vec![(
             2,
             Effect::Projectile(Box::new(ProjectileEffect {
                 offset: Position::ZERO,
@@ -89,10 +89,10 @@ fn tank(assets: &Rc<Assets>) -> UnitTemplate {
                     &[assets.mech.tank.projectile.clone()],
                     1.0 / 16.0,
                     Time::ONE,
-                    None,
+                    vec![],
                 ),
             })),
-        )),
+        )],
     );
     UnitTemplate {
         ai: UnitAI::Engage {
@@ -128,14 +128,14 @@ fn artillery(assets: &Rc<Assets>) -> UnitTemplate {
         &[assets.mech.artillery.idle.clone()],
         1.0 / 32.0,
         Time::ONE,
-        None,
+        vec![],
     );
-    let move_animation = to_animation(&assets.mech.artillery.walk, 1.0 / 32.0, Time::ONE, None);
+    let move_animation = to_animation(&assets.mech.artillery.walk, 1.0 / 32.0, Time::ONE, vec![]);
     let animation = to_animation(
         &assets.mech.artillery.attack,
         1.0 / 32.0,
         Time::ONE,
-        Some((
+        vec![(
             2,
             Effect::Projectile(Box::new(ProjectileEffect {
                 offset: vec2(-0.5, 0.5).map(Coord::new),
@@ -153,10 +153,10 @@ fn artillery(assets: &Rc<Assets>) -> UnitTemplate {
                     &assets.mech.artillery.projectile_anim,
                     1.0 / 24.0,
                     Time::ONE,
-                    None,
+                    vec![],
                 ),
             })),
-        )),
+        )],
     );
     UnitTemplate {
         ai: UnitAI::Engage {
@@ -187,19 +187,19 @@ fn healer(assets: &Rc<Assets>) -> UnitTemplate {
         &[assets.mech.healer.idle.clone()],
         1.0 / 32.0,
         Time::ONE,
-        None,
+        vec![],
     );
-    let move_animation = to_animation(&assets.mech.healer.walk, 1.0 / 32.0, Time::ONE, None);
+    let move_animation = to_animation(&assets.mech.healer.walk, 1.0 / 32.0, Time::ONE, vec![]);
     let animation = to_animation(
         &assets.mech.healer.heal,
         1.0 / 32.0,
         Time::ONE,
-        Some((
+        vec![(
             5,
             Effect::Heal(Box::new(HealEffect {
                 value: Hp::new(5.0),
             })),
-        )),
+        )],
     );
     UnitTemplate {
         ai: UnitAI::Engage {
@@ -230,14 +230,14 @@ fn blighter(assets: &Rc<Assets>) -> UnitTemplate {
         &[assets.enemies.blighter.idle.clone()],
         1.0 / 32.0,
         Time::ONE,
-        None,
+        vec![],
     );
-    let move_animation = to_animation(&assets.enemies.blighter.walk, 1.0 / 32.0, Time::ONE, None);
+    let move_animation = to_animation(&assets.enemies.blighter.walk, 1.0 / 32.0, Time::ONE, vec![]);
     let animation = to_animation(
         &assets.enemies.blighter.attack,
         1.0 / 32.0,
         Time::ONE,
-        Some((
+        vec![(
             10,
             Effect::Projectile(Box::new(ProjectileEffect {
                 offset: vec2(0.0, 0.5).map(Coord::new),
@@ -251,10 +251,10 @@ fn blighter(assets: &Rc<Assets>) -> UnitTemplate {
                     &[assets.enemies.blighter.projectile.clone()],
                     1.0 / 32.0,
                     Time::ONE,
-                    None,
+                    vec![],
                 ),
             })),
-        )),
+        )],
     );
     UnitTemplate {
         ai: UnitAI::Engage {
@@ -285,21 +285,21 @@ fn ravager(assets: &Rc<Assets>) -> UnitTemplate {
         &[assets.enemies.ravager.idle.clone()],
         1.0 / 32.0,
         Time::ONE,
-        None,
+        vec![],
     );
-    let move_animation = to_animation(&assets.enemies.ravager.walk, 1.0 / 32.0, Time::ONE, None);
-    let roar = to_animation(&assets.enemies.ravager.roar, 1.0 / 32.0, Time::ONE, None);
+    let move_animation = to_animation(&assets.enemies.ravager.walk, 1.0 / 32.0, Time::ONE, vec![]);
+    let roar = to_animation(&assets.enemies.ravager.roar, 1.0 / 32.0, Time::ONE, vec![]);
     let anticipation = to_animation(
         &assets.enemies.ravager.anticipation,
         1.0 / 32.0,
         Time::ONE,
-        None,
+        vec![],
     );
     let charge = to_animation(
         &assets.enemies.ravager.charge,
         1.0 / 32.0,
         Time::ONE,
-        Some((
+        vec![(
             1,
             Effect::Dash(Box::new(DashEffect {
                 speed: Coord::new(15.0),
@@ -309,9 +309,14 @@ fn ravager(assets: &Rc<Assets>) -> UnitTemplate {
                     value: Hp::new(5.0),
                 })),
             })),
-        )),
+        )],
     );
-    let attack = to_animation(&assets.enemies.ravager.charge, 1.0 / 32.0, Time::ONE, None);
+    let attack = to_animation(
+        &assets.enemies.ravager.charge,
+        1.0 / 32.0,
+        Time::ONE,
+        vec![],
+    );
     UnitTemplate {
         ai: UnitAI::Engage {
             target: TargetAI::Closest,

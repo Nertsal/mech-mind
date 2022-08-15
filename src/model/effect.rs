@@ -214,7 +214,7 @@ impl HealEffect {
             &logic.model.assets.effects.heal,
             1.0 / 32.0,
             Time::ONE,
-            None,
+            vec![],
         );
         logic.model.particles.insert(Particle {
             id: logic.model.id_gen.gen(),
