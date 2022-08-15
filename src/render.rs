@@ -1,6 +1,6 @@
 use std::collections::VecDeque;
 
-use crate::game::PlayerEvent;
+use crate::game::{PlayerEvent, MechType};
 
 use super::*;
 use geng::{Camera2d, Draw2d};
@@ -35,6 +35,9 @@ pub struct Render {
     background: Background,
     last_cam_pos: Coord,
     pub visualize_hitboxes: bool,
+    artillery_slot: AABB<f32>,
+    tank_slot: AABB<f32>,
+    healer_slot: AABB<f32>,
 }
 
 impl Render {
@@ -50,11 +53,30 @@ impl Render {
             background: Background::new(assets),
             last_cam_pos: Coord::ZERO,
             visualize_hitboxes: false,
+            artillery_slot: AABB::ZERO,
+            tank_slot: AABB::ZERO,
+            healer_slot: AABB::ZERO,
         }
     }
 
     pub fn handle_event(&mut self, event: geng::Event) -> Vec<PlayerEvent> {
-        vec![]
+        let mut events = Vec::new();
+        match event {
+            geng::Event::MouseDown { position, button: geng::MouseButton::Left } => {
+                let pos = position.map(|x| x as f32);
+                if self.artillery_slot.contains(pos) {
+                    events.push(PlayerEvent::SpawnMech(MechType::Artillery));
+                }
+                if self.tank_slot.contains(pos) {
+                    events.push(PlayerEvent::SpawnMech(MechType::Tank));
+                }
+                if self.healer_slot.contains(pos) {
+                    events.push(PlayerEvent::SpawnMech(MechType::Healer));
+                }
+            }
+            _ => {}
+        }
+        events
     }
 
     pub fn draw(&mut self, model: &Model, framebuffer: &mut ugli::Framebuffer) {
@@ -347,6 +369,7 @@ impl Render {
         };
         draw_2d::TexturedQuad::colored(aabb, back, color).draw_2d(geng, framebuffer, camera);
         draw_2d::TexturedQuad::new(aabb, sprite.texture).draw_2d(geng, framebuffer, camera);
+        self.artillery_slot = aabb;
 
         // Tank
         let sprite = Sprite::new(&self.assets.ui.tank_slot, 4.0);
@@ -360,6 +383,7 @@ impl Render {
         };
         draw_2d::TexturedQuad::colored(aabb, back, color).draw_2d(geng, framebuffer, camera);
         draw_2d::TexturedQuad::new(aabb, sprite.texture).draw_2d(geng, framebuffer, camera);
+        self.tank_slot = aabb;
 
         // Healer
         let sprite = Sprite::new(&self.assets.ui.healer_slot, 4.0);
@@ -373,6 +397,7 @@ impl Render {
         };
         draw_2d::TexturedQuad::colored(aabb, back, color).draw_2d(geng, framebuffer, camera);
         draw_2d::TexturedQuad::new(aabb, sprite.texture).draw_2d(geng, framebuffer, camera);
+        self.healer_slot = aabb;
     }
 }
 

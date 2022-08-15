@@ -48,7 +48,7 @@ impl Model {
             assets: assets.clone(),
             id_gen: IdGen::new(),
             player_energy: Health {
-                hp: Hp::ZERO,
+                hp: Hp::new(50.0),
                 max_hp: Hp::new(100.0),
             },
             left_border: Coord::new(-20.0),

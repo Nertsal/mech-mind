@@ -5,7 +5,14 @@ use super::*;
 impl Model {
     pub fn handle_event(&mut self, event: PlayerEvent) {
         match event {
-            PlayerEvent::SpawnMech { template, cost } => {
+            PlayerEvent::SpawnMech(mech) => {
+                let (template, cost) = match mech {
+                    game::MechType::Artillery => {
+                        (self.templates.artillery.clone(), Currency::new(10.0))
+                    }
+                    game::MechType::Tank => (self.templates.tank.clone(), Currency::new(10.0)),
+                    game::MechType::Healer => (self.templates.healer.clone(), Currency::new(10.0)),
+                };
                 if self.player_energy.hp < cost {
                     return;
                 }

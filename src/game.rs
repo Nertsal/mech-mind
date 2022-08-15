@@ -12,11 +12,15 @@ pub struct Game {
 }
 
 #[derive(Debug)]
+pub enum MechType {
+    Artillery,
+    Tank,
+    Healer,
+}
+
+#[derive(Debug)]
 pub enum PlayerEvent {
-    SpawnMech {
-        template: UnitTemplate,
-        cost: Currency,
-    }
+    SpawnMech(MechType),
 }
 
 impl Game {
