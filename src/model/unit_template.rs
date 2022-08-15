@@ -41,7 +41,7 @@ impl UnitTemplate {
 
 pub fn to_animation(
     textures: &[assets::PixelTexture],
-    sprite_size: Vec2<f32>,
+    sprite_scale: f32,
     cycle_time: Time,
     action: Option<(usize, Effect)>,
 ) -> Rc<Animation> {
@@ -52,10 +52,7 @@ pub fn to_animation(
                 .iter()
                 .enumerate()
                 .map(|(frame, texture)| AnimationFrame {
-                    sprite: Sprite {
-                        texture: texture.texture(),
-                        size: sprite_size,
-                    },
+                    sprite: Sprite::new(&texture.texture(), sprite_scale),
                     time,
                     start_effect: action.as_ref().and_then(|(action_frame, action)| {
                         (frame == *action_frame).then(|| action.clone())
@@ -69,14 +66,14 @@ pub fn to_animation(
 fn tank(assets: &Rc<Assets>) -> UnitTemplate {
     let idle_animation = to_animation(
         &[assets.mech.tank.idle.clone()],
-        vec2(2.0, 2.0),
+        1.0 / 32.0,
         Time::ONE,
         None,
     );
-    let move_animation = to_animation(&assets.mech.tank.walk, vec2(2.0, 2.0), Time::ONE, None);
+    let move_animation = to_animation(&assets.mech.tank.walk, 1.0 / 32.0, Time::ONE, None);
     let animation = to_animation(
         &assets.mech.tank.attack,
-        vec2(2.0, 2.0),
+        1.0 / 32.0,
         Time::ONE,
         Some((
             2,
@@ -90,7 +87,7 @@ fn tank(assets: &Rc<Assets>) -> UnitTemplate {
                 })),
                 animation: to_animation(
                     &[assets.mech.tank.projectile.clone()],
-                    vec2(0.5, 0.2),
+                    1.0 / 16.0,
                     Time::ONE,
                     None,
                 ),
@@ -129,14 +126,14 @@ fn tank(assets: &Rc<Assets>) -> UnitTemplate {
 fn artillery(assets: &Rc<Assets>) -> UnitTemplate {
     let idle_animation = to_animation(
         &[assets.mech.artillery.idle.clone()],
-        vec2(2.0, 2.0),
+        1.0 / 32.0,
         Time::ONE,
         None,
     );
-    let move_animation = to_animation(&assets.mech.artillery.walk, vec2(2.0, 2.0), Time::ONE, None);
+    let move_animation = to_animation(&assets.mech.artillery.walk, 1.0 / 32.0, Time::ONE, None);
     let animation = to_animation(
         &assets.mech.artillery.attack,
-        vec2(2.0, 2.0),
+        1.0 / 32.0,
         Time::ONE,
         Some((
             2,
@@ -154,7 +151,7 @@ fn artillery(assets: &Rc<Assets>) -> UnitTemplate {
                 })),
                 animation: to_animation(
                     &assets.mech.artillery.projectile_anim,
-                    vec2(1.0, 0.5),
+                    1.0 / 24.0,
                     Time::ONE,
                     None,
                 ),
@@ -188,14 +185,14 @@ fn artillery(assets: &Rc<Assets>) -> UnitTemplate {
 fn healer(assets: &Rc<Assets>) -> UnitTemplate {
     let idle_animation = to_animation(
         &[assets.mech.healer.idle.clone()],
-        vec2(2.0, 2.0),
+        1.0 / 32.0,
         Time::ONE,
         None,
     );
-    let move_animation = to_animation(&assets.mech.healer.walk, vec2(2.0, 2.0), Time::ONE, None);
+    let move_animation = to_animation(&assets.mech.healer.walk, 1.0 / 32.0, Time::ONE, None);
     let animation = to_animation(
         &assets.mech.healer.heal,
-        vec2(2.0, 2.0),
+        1.0 / 32.0,
         Time::ONE,
         Some((
             5,
@@ -231,19 +228,14 @@ fn healer(assets: &Rc<Assets>) -> UnitTemplate {
 fn blighter(assets: &Rc<Assets>) -> UnitTemplate {
     let idle_animation = to_animation(
         &[assets.enemies.blighter.idle.clone()],
-        vec2(2.0, 2.0),
+        1.0 / 32.0,
         Time::ONE,
         None,
     );
-    let move_animation = to_animation(
-        &assets.enemies.blighter.walk,
-        vec2(2.0, 2.0),
-        Time::ONE,
-        None,
-    );
+    let move_animation = to_animation(&assets.enemies.blighter.walk, 1.0 / 32.0, Time::ONE, None);
     let animation = to_animation(
         &assets.enemies.blighter.attack,
-        vec2(2.0, 2.0),
+        1.0 / 32.0,
         Time::ONE,
         Some((
             10,
@@ -257,7 +249,7 @@ fn blighter(assets: &Rc<Assets>) -> UnitTemplate {
                 })),
                 animation: to_animation(
                     &[assets.enemies.blighter.projectile.clone()],
-                    vec2(0.5, 0.5),
+                    1.0 / 32.0,
                     Time::ONE,
                     None,
                 ),
@@ -291,31 +283,21 @@ fn blighter(assets: &Rc<Assets>) -> UnitTemplate {
 fn ravager(assets: &Rc<Assets>) -> UnitTemplate {
     let idle_animation = to_animation(
         &[assets.enemies.ravager.idle.clone()],
-        vec2(2.0, 2.0),
+        1.0 / 32.0,
         Time::ONE,
         None,
     );
-    let move_animation = to_animation(
-        &assets.enemies.ravager.walk,
-        vec2(2.0, 2.0),
-        Time::ONE,
-        None,
-    );
-    let roar = to_animation(
-        &assets.enemies.ravager.roar,
-        vec2(2.0, 2.0),
-        Time::ONE,
-        None,
-    );
+    let move_animation = to_animation(&assets.enemies.ravager.walk, 1.0 / 32.0, Time::ONE, None);
+    let roar = to_animation(&assets.enemies.ravager.roar, 1.0 / 32.0, Time::ONE, None);
     let anticipation = to_animation(
         &assets.enemies.ravager.anticipation,
-        vec2(2.0, 2.0),
+        1.0 / 32.0,
         Time::ONE,
         None,
     );
     let charge = to_animation(
         &assets.enemies.ravager.charge,
-        vec2(2.0, 2.0),
+        1.0 / 32.0,
         Time::ONE,
         Some((
             1,
@@ -329,12 +311,7 @@ fn ravager(assets: &Rc<Assets>) -> UnitTemplate {
             })),
         )),
     );
-    let attack = to_animation(
-        &assets.enemies.ravager.charge,
-        vec2(2.0, 2.0),
-        Time::ONE,
-        None,
-    );
+    let attack = to_animation(&assets.enemies.ravager.charge, 1.0 / 32.0, Time::ONE, None);
     UnitTemplate {
         ai: UnitAI::Engage {
             target: TargetAI::Closest,

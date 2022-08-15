@@ -207,7 +207,7 @@ impl HealEffect {
         let target_position = target.position;
         let animation = unit_template::to_animation(
             &logic.model.assets.effects.heal,
-            vec2(2.0, 2.0),
+            1.0 / 32.0,
             Time::ONE,
             None,
         );

@@ -6,9 +6,20 @@ pub use pixel_texture::*;
 
 #[derive(geng::Assets)]
 pub struct Assets {
+    pub background: BackgroundAssets,
     pub effects: EffectAssets,
     pub enemies: EnemyAssets,
     pub mech: MechAssets,
+}
+
+#[derive(geng::Assets)]
+pub struct BackgroundAssets {
+    pub background: PixelTexture,
+    pub floor: PixelTexture,
+    pub pillar1: PixelTexture,
+    pub pillar2: PixelTexture,
+    pub tower: PixelTexture,
+    pub town: PixelTexture,
 }
 
 #[derive(geng::Assets)]

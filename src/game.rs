@@ -32,6 +32,9 @@ impl geng::State for Game {
         #[allow(clippy::single_match)]
         match event {
             geng::Event::KeyDown { key } => match key {
+                geng::Key::F1 => {
+                    self.render.visualize_hitboxes = !self.render.visualize_hitboxes;
+                }
                 geng::Key::Num1 => {
                     self.model.spawn_unit(
                         self.model.templates.healer.clone(),

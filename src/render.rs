@@ -1,7 +1,15 @@
+use std::collections::VecDeque;
+
 use super::*;
 use geng::{Camera2d, Draw2d};
 
 use model::*;
+
+mod background;
+mod repeating;
+
+use background::*;
+use repeating::*;
 
 const FOV: f32 = 20.0;
 
@@ -10,6 +18,9 @@ pub struct Render {
     geng: Geng,
     assets: Rc<Assets>,
     camera: Camera2d,
+    background: Background,
+    last_cam_pos: Coord,
+    pub visualize_hitboxes: bool,
 }
 
 impl Render {
@@ -22,6 +33,9 @@ impl Render {
                 rotation: 0.0,
                 fov: FOV,
             },
+            background: Background::new(assets),
+            last_cam_pos: Coord::ZERO,
+            visualize_hitboxes: false,
         }
     }
 
@@ -30,8 +44,52 @@ impl Render {
         let camera_width = self.camera.fov * framebuffer_size.x / framebuffer_size.y;
         self.camera.center.x = model.left_border.as_f32() + camera_width / 2.0;
 
+        self.background.update(
+            Coord::new(camera_width),
+            Coord::new(self.camera.center.x) - self.last_cam_pos,
+        );
+        for (pos, sprite) in self
+            .background
+            .background
+            .placed
+            .iter()
+            .map(|x| {
+                (
+                    vec2(
+                        *x,
+                        Coord::new(self.background.background.sprite.size.y / 2.0),
+                    ),
+                    &self.background.background.sprite,
+                )
+            })
+            .chain(self.background.floor.placed.iter().map(|x| {
+                (
+                    vec2(*x, -Coord::new(self.background.floor.sprite.size.y / 2.0)),
+                    &self.background.floor.sprite,
+                )
+            }))
+            .chain(
+                self.background
+                    .placed
+                    .iter()
+                    .map(|(pos, _, sprite)| (*pos, sprite)),
+            )
+        {
+            draw_sprite(
+                sprite,
+                pos + vec2(model.left_border, model.ground_level),
+                false,
+                0.0,
+                &self.geng,
+                framebuffer,
+                &self.camera,
+            );
+        }
+
         self.draw_world(model, framebuffer);
         self.draw_ui(model, framebuffer);
+
+        self.last_cam_pos = Coord::new(self.camera.center.x);
     }
 
     fn draw_world(&mut self, model: &Model, framebuffer: &mut ugli::Framebuffer) {
@@ -132,6 +190,34 @@ impl Render {
             )
             .draw_2d(geng, framebuffer, camera);
         }
+
+        // Hitboxes
+        if self.visualize_hitboxes {
+            for (pos, collider) in model
+                .units
+                .iter()
+                .map(|unit| (unit.position, &unit.collider))
+                .chain(
+                    model
+                        .projectiles
+                        .iter()
+                        .map(|proj| (proj.position, &proj.collider)),
+                )
+            {
+                match collider {
+                    Collider::Aabb { size } => {
+                        draw_aabb_frame(
+                            AABB::point(pos).extend_symmetric(*size / Coord::new(2.0)),
+                            Coord::new(0.1),
+                            Color::GREEN,
+                            geng,
+                            framebuffer,
+                            camera,
+                        );
+                    }
+                }
+            }
+        }
     }
 
     fn draw_ui(&mut self, model: &Model, framebuffer: &mut ugli::Framebuffer) {
@@ -151,6 +237,27 @@ impl Render {
         .translate(currency_pos)
         .draw_2d(geng, framebuffer, camera);
     }
+}
+
+fn draw_aabb_frame(
+    aabb: AABB<Coord>,
+    width: Coord,
+    color: Color<f32>,
+    geng: &Geng,
+    framebuffer: &mut ugli::Framebuffer,
+    camera: &impl geng::AbstractCamera2d,
+) {
+    let aabb = aabb.map(|x| x.as_f32());
+    let left_mid = vec2(aabb.x_min, aabb.center().y);
+    let chain = Chain::new(vec![
+        left_mid,
+        aabb.top_left(),
+        aabb.top_right(),
+        aabb.bottom_right(),
+        aabb.bottom_left(),
+        left_mid,
+    ]);
+    draw_2d::Chain::new(chain, width.as_f32(), color, 0).draw_2d(geng, framebuffer, camera);
 }
 
 fn draw_sprite(
