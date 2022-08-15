@@ -205,7 +205,7 @@ impl DamageEffect {
         let alive = target.health.is_alive();
         target.health.change(-self.value); // TODO: account for different damage types
         let killed = alive && !target.health.is_alive();
-        if killed {
+        let sound = if killed {
             let effect = QueuedEffect {
                 effect: target.on_death.clone(),
                 context: EffectContext {
@@ -213,7 +213,20 @@ impl DamageEffect {
                     target: None,
                 },
             };
+            let faction = target.faction;
             logic.effects.push_front(effect);
+            match faction {
+                Faction::Mech => Some(logic.model.assets.sound_design.mechs.death.clone()),
+                Faction::Alien => Some(logic.model.assets.sound_design.enemies.death.clone()),
+            }
+        } else {
+            match target.faction {
+                Faction::Mech => Some(logic.model.assets.sound_design.mechs.hit.clone()),
+                Faction::Alien => None,
+            }
+        };
+        if let Some(sound) = sound {
+            logic.model.play_sound(&sound);
         }
         Some(())
     }
