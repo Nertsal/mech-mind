@@ -20,36 +20,14 @@ impl Logic<'_> {
                         // Go towards the target
                         let vx = (target.position.x - unit.position.x).clamp_abs(unit.speed);
                         unit.target_velocity = vec2(vx, unit.velocity.y);
-                        if !Rc::ptr_eq(&unit.animation_state.animation, &unit.move_animation) {
-                            let (state, effect) = AnimationState::new(&unit.move_animation);
-                            unit.animation_state = state;
-                            if let Some(effect) = effect {
-                                self.effects.push_front(QueuedEffect {
-                                    effect,
-                                    context: EffectContext {
-                                        caster: Some(unit.id),
-                                        target: Some(target.id),
-                                    },
-                                })
-                            }
-                        }
+                        unit.animation_state.switch(&unit.move_animation);
                         return;
                     } else if let ActionState::Ready = unit.action_state {
                         // The target is in range -> attack
                         unit.action_state = ActionState::InProgress {
                             target: Some(target.id),
                         };
-                        let (state, effect) = AnimationState::new(&unit.action.animation);
-                        unit.animation_state = state;
-                        if let Some(effect) = effect {
-                            self.effects.push_front(QueuedEffect {
-                                effect,
-                                context: EffectContext {
-                                    caster: Some(unit.id),
-                                    target: Some(target.id),
-                                },
-                            })
-                        }
+                        unit.animation_state.switch(&unit.action.animation);
                     }
                 } else {
                     // Default
@@ -96,19 +74,7 @@ impl Logic<'_> {
                     if target_dir != Coord::ZERO {
                         unit.target_velocity =
                             vec2(unit.speed * target_dir.signum(), unit.velocity.y);
-                        if !Rc::ptr_eq(&unit.animation_state.animation, &unit.move_animation) {
-                            let (state, effect) = AnimationState::new(&unit.move_animation);
-                            unit.animation_state = state;
-                            if let Some(effect) = effect {
-                                self.effects.push_front(QueuedEffect {
-                                    effect,
-                                    context: EffectContext {
-                                        caster: Some(unit.id),
-                                        target: None,
-                                    },
-                                })
-                            }
-                        }
+                        unit.animation_state.switch(&unit.move_animation);
                         return;
                     }
                 }
@@ -131,32 +97,9 @@ impl Logic<'_> {
                                 unit.action_state = ActionState::InProgress {
                                     target: Some(target.id),
                                 };
-                                let (state, effect) = AnimationState::new(&unit.action.animation);
-                                unit.animation_state = state;
-                                if let Some(effect) = effect {
-                                    self.effects.push_front(QueuedEffect {
-                                        effect,
-                                        context: EffectContext {
-                                            caster: Some(unit.id),
-                                            target: Some(target.id),
-                                        },
-                                    })
-                                }
-                            } else if !Rc::ptr_eq(
-                                &unit.animation_state.animation,
-                                &unit.move_animation,
-                            ) {
-                                let (state, effect) = AnimationState::new(&unit.move_animation);
-                                unit.animation_state = state;
-                                if let Some(effect) = effect {
-                                    self.effects.push_front(QueuedEffect {
-                                        effect,
-                                        context: EffectContext {
-                                            caster: Some(unit.id),
-                                            target: None,
-                                        },
-                                    })
-                                }
+                                unit.animation_state.switch(&unit.action.animation);
+                            } else {
+                                unit.animation_state.switch(&unit.move_animation);
                             }
                             // Fly towards the target
                             unit.target_velocity = delta.normalize_or_zero() * *charge_speed;
@@ -171,19 +114,7 @@ impl Logic<'_> {
                     }
                     ActionState::Cooldown { .. } => {
                         // Fly around at the preferred height
-                        if !Rc::ptr_eq(&unit.animation_state.animation, &unit.move_animation) {
-                            let (state, effect) = AnimationState::new(&unit.move_animation);
-                            unit.animation_state = state;
-                            if let Some(effect) = effect {
-                                self.effects.push_front(QueuedEffect {
-                                    effect,
-                                    context: EffectContext {
-                                        caster: Some(unit.id),
-                                        target: None,
-                                    },
-                                })
-                            }
-                        }
+                        unit.animation_state.switch(&unit.move_animation);
                         let bounds = AABB::points_bounding_box(
                             std::iter::once(vec2(self.model.left_border, Coord::ZERO)).chain(
                                 self.model
@@ -230,9 +161,7 @@ impl Logic<'_> {
 
         match &unit.action_state {
             ActionState::Ready | ActionState::Cooldown { .. } => {
-                if !Rc::ptr_eq(&unit.animation_state.animation, &unit.idle_animation) {
-                    unit.animation_state = AnimationState::new(&unit.idle_animation).0;
-                }
+                unit.animation_state.switch(&unit.idle_animation);
             }
             ActionState::InProgress { target } => {
                 if let Some(target_pos) = target

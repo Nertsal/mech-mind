@@ -130,7 +130,7 @@ impl ProjectileEffect {
         logic.model.projectiles.insert(Projectile {
             friend_faction: Some(caster.faction),
             id: logic.model.id_gen.gen(),
-            animation_state: AnimationState::new(&self.animation).0,
+            animation_state: AnimationState::new(&self.animation),
             ai: self.ai,
             lifetime: Time::new(10.0),
             collider: self.collider,
@@ -248,7 +248,7 @@ impl HealEffect {
             alive: true,
             follow_unit: context.target,
             position: target_position,
-            animation_state: AnimationState::new(&animation).0,
+            animation_state: AnimationState::new(&animation),
         });
         Some(())
     }

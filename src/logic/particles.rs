@@ -9,9 +9,9 @@ impl Logic<'_> {
             {
                 particle.position = unit.position;
             }
-            let (looped, effects) = particle.animation_state.update(self.delta_time);
+            let looped = particle.animation_state.update(self.delta_time);
             particle.alive = !looped;
-            for effect in effects {
+            for effect in particle.animation_state.take_effects() {
                 self.effects.push_front(QueuedEffect {
                     effect,
                     context: EffectContext {

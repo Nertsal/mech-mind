@@ -31,7 +31,7 @@ impl UnitTemplate {
             action: self.action,
             action_state: self.start_action_state,
             flip_sprite: false,
-            animation_state: AnimationState::new(&self.idle_animation).0,
+            animation_state: AnimationState::new(&self.idle_animation),
             idle_animation: self.idle_animation,
             move_animation: self.move_animation,
             extra_render: self.extra_render,

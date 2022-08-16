@@ -18,14 +18,16 @@ pub struct AnimationState {
     pub animation: Rc<Animation>,
     pub frame: usize,
     pub frame_time: Time,
+    pub effects: Vec<Effect>,
 }
 
 impl AnimationState {
-    pub fn new(animation: &Rc<Animation>) -> (Self, Option<Effect>) {
-        let state = Self {
+    pub fn new(animation: &Rc<Animation>) -> Self {
+        let mut state = Self {
             animation: animation.clone(),
             frame: 0,
             frame_time: Time::ZERO,
+            effects: vec![],
         };
         let effect = animation
             .keyframes
@@ -33,21 +35,32 @@ impl AnimationState {
             .expect("Animations cannot have zero frames")
             .start_effect
             .clone();
-        (state, effect)
+        if let Some(effect) = effect {
+            state.effects.push(effect);
+        }
+        state
+    }
+
+    pub fn switch(&mut self, animation: &Rc<Animation>) {
+        if Rc::ptr_eq(&self.animation, animation) {
+            // Same animation
+            return;
+        }
+        *self = Self::new(animation);
     }
 
     pub fn get_sprite(&self) -> &Sprite {
         &self.animation.keyframes.get(self.frame).unwrap().sprite
     }
 
-    /// Update the animation state and returns whether it has started to loop
-    /// and effects that should be processed.
-    pub fn update(&mut self, delta_time: Time) -> (bool, Vec<Effect>) {
+    pub fn take_effects(&mut self) -> Vec<Effect> {
+        std::mem::take(&mut self.effects)
+    }
+
+    /// Update the animation state and returns whether it has started to loop.
+    pub fn update(&mut self, delta_time: Time) -> bool {
         self.frame_time += delta_time;
-
         let mut looped = false;
-        let mut effects = Vec::new();
-
         loop {
             let frame = self
                 .animation
@@ -73,12 +86,12 @@ impl AnimationState {
                     .start_effect
                     .clone()
                 {
-                    effects.push(effect);
+                    self.effects.push(effect);
                 }
             } else {
                 break;
             }
         }
-        (looped, effects)
+        looped
     }
 }
